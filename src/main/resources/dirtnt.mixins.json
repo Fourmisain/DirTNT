@@ -1,0 +1,17 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "fourmisain.dirtnt.mixin",
+	"compatibilityLevel": "JAVA_8",
+	"mixins": [
+		"TntBlockMixin",
+		"TntEntityMixin"
+	],
+	"client": [
+		"ClientPlayNetworkHandlerMixin",
+		"TntEntityRendererMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
