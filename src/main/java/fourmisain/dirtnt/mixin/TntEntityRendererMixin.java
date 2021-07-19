@@ -16,16 +16,16 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 @Mixin(TntEntityRenderer.class)
 public abstract class TntEntityRendererMixin implements Dirtable {
 	@Unique
-	boolean isDirtTnt = false;
+	private boolean isDirty = false;
 
 	public void makeDirty() {
-		isDirtTnt = true;
+		isDirty = true;
 	}
 
 	@ModifyArg(method = "render",
 		at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/TntMinecartEntityRenderer;renderFlashingBlock(Lnet/minecraft/block/BlockState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IZ)V"),
 		index = 0)
 	private BlockState replaceTntTexture(BlockState blockState) {
-		return isDirtTnt ? DirTnt.DIRT_TNT_BLOCK.getDefaultState() : blockState;
+		return isDirty ? DirTnt.DIRT_TNT_BLOCK.getDefaultState() : blockState;
 	}
 }

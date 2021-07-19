@@ -31,7 +31,7 @@ public abstract class ClientPlayNetworkHandlerMixin {
 		at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/network/packet/s2c/play/EntitySpawnS2CPacket;getEntityTypeId()Lnet/minecraft/entity/EntityType;", ordinal = 0),
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		cancellable = true)
-	void a(EntitySpawnS2CPacket packet, CallbackInfo ci, double d, double e, double f, EntityType<?> entityType) {
+	void spawnDirtTnt(EntitySpawnS2CPacket packet, CallbackInfo ci, double d, double e, double f, EntityType<?> entityType) {
 		NetworkThreadUtils.forceMainThread(packet, (ClientPlayNetworkHandler) (Object) this, client);
 
 		if (entityType == DirTnt.DIRT_TNT_ENTITY_TYPE) {

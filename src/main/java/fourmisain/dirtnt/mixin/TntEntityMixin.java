@@ -13,17 +13,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(TntEntity.class)
 public abstract class TntEntityMixin implements Dirtable {
 	@Unique
-	boolean isDirtTnt = false;
+	private boolean isDirty = false;
 
 	public void makeDirty() {
-		isDirtTnt = true;
+		isDirty = true;
 	}
 
 	@Inject(method = "explode", at = @At("HEAD"), cancellable = true)
-	private void explode(CallbackInfo ci) {
+	private void dirtyExplode(CallbackInfo ci) {
 		TntEntity self = (TntEntity) (Object) this;
 
-		if (isDirtTnt) {
+		if (isDirty) {
 			DirtTntEntity.createDirtExplosion(self, self.world, self.getBlockPos());
 			ci.cancel();
 		}
