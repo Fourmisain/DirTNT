@@ -3,7 +3,7 @@
 	"id": "dirtnt",
 	"version": "${version}",
 	"name": "DirTNT",
-	"description": "Adds Dirt TNT, which can be used to fill potholes",
+	"description": "Adds Dirt TNT, which can be used to fill small holes in the ground",
 	"authors": [
 		"Fourmisain"
 	],

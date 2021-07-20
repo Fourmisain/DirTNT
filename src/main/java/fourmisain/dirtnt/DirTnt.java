@@ -16,8 +16,6 @@ import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-// TODO add recipe
-
 @SuppressWarnings("ConstantConditions")
 public class DirTnt implements ModInitializer {
     public static final String MOD_ID = "dirtnt";
