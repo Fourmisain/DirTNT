@@ -13,9 +13,9 @@ import net.minecraft.client.render.entity.TntEntityRenderer;
 public class DirTNTClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        EntityRendererRegistry.INSTANCE.register(DirTnt.DIRT_TNT_ENTITY_TYPE, (manager, context) -> {
+        EntityRendererRegistry.INSTANCE.register(DirTnt.DIRT_TNT_ENTITY_TYPE, (context) -> {
             // use a dirty TNT renderer
-            Dirtable renderer = (Dirtable) new TntEntityRenderer(manager);
+            Dirtable renderer = (Dirtable) new TntEntityRenderer(context);
             renderer.makeDirty();
             return (TntEntityRenderer) renderer;
         });

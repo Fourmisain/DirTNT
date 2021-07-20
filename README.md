@@ -7,5 +7,5 @@ Video demonstration:
 
 ![TNT surrounded by Dirt makes Dirt TNT](recipe.png)
 
-- requires Minecraft 1.16 and Fabric Loader and Fabric API
+- requires Minecraft 1.16-1.17 and Fabric Loader and Fabric API
 - required on the server and client

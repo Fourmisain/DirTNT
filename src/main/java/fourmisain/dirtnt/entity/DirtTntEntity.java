@@ -12,7 +12,6 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 public class DirtTntEntity extends TntEntity {
@@ -48,11 +47,8 @@ public class DirtTntEntity extends TntEntity {
 					BlockPos targetBlockPos = blockPos.add(x, y, z);
 
 					if (targetBlockPos.isWithinDistance(blockPos, RADIUS)) {
-						RaycastContext context = new RaycastContext(blockCenter, Vec3d.ofCenter(targetBlockPos),
-							RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, entity);
-
 						// walk through all blocks from the explosion center to the target block
-						BlockView.raycast(context, (ctx, pos) -> {
+						BlockView.raycast(blockCenter, Vec3d.ofCenter(targetBlockPos), null, (ctx, pos) -> {
 							BlockState state = world.getBlockState(pos);
 
 							// place dirt if possible
