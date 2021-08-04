@@ -40,11 +40,13 @@ public class DirtTntEntity extends TntEntity {
 
 		Vec3d blockCenter = Vec3d.ofCenter(blockPos);
 
+		BlockPos.Mutable targetBlockPos = new BlockPos.Mutable();
+
 		// for every 'target' block within a distance of RADIUS
 		for (int x = -RADIUS; x <= RADIUS; x++) {
 			for (int y = -RADIUS; y <= RADIUS; y++) {
 				for (int z = -RADIUS; z <= RADIUS; z++) {
-					BlockPos targetBlockPos = blockPos.add(x, y, z);
+					targetBlockPos.set(blockPos, x, y, z);
 
 					if (targetBlockPos.isWithinDistance(blockPos, RADIUS)) {
 						// walk through all blocks from the explosion center to the target block
