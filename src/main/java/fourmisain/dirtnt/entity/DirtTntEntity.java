@@ -9,14 +9,16 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.TntEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 public class DirtTntEntity extends TntEntity {
-	public static final int RADIUS = 4;
+	public static final int RADIUS = 3;
 
 	public DirtTntEntity(EntityType<? extends TntEntity> entityType, World world) {
 		super(entityType, world);
@@ -34,12 +36,14 @@ public class DirtTntEntity extends TntEntity {
 		this.prevZ = z;
 	}
 
-	public static void createDirtExplosion(Entity entity, World world, BlockPos blockPos) {
-		if (!world.isClient) {
-			world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F);
-		}
+	public static void createDirtExplosion(Entity entity, World world) {
+		if (world.isClient) return;
 
-		Vec3d blockCenter = Vec3d.ofCenter(blockPos);
+			world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F);
+
+		// center explosion at the entity
+		BlockPos centerBlockPos = entity.getBlockPos();
+		Vec3d centerVec = entity.getBoundingBox().getCenter();
 
 		BlockPos.Mutable targetBlockPos = new BlockPos.Mutable();
 
@@ -47,25 +51,36 @@ public class DirtTntEntity extends TntEntity {
 		for (int x = -RADIUS; x <= RADIUS; x++) {
 			for (int y = -RADIUS; y <= RADIUS; y++) {
 				for (int z = -RADIUS; z <= RADIUS; z++) {
-					targetBlockPos.set(blockPos, x, y, z);
+					targetBlockPos.set(centerVec.x + x, centerVec.y + y, centerVec.z + z);
+					Vec3d targetVec = Vec3d.ofCenter(targetBlockPos);
 
-					if (targetBlockPos.isWithinDistance(blockPos, RADIUS)) {
-						RaycastContext context = new RaycastContext(blockCenter, Vec3d.ofCenter(targetBlockPos),
-							RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, entity);
+					if (targetBlockPos.isWithinDistance(centerBlockPos, RADIUS + 1)) {
+						RaycastContext context = new RaycastContext(centerVec, targetVec,
+							RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity);
 
 						// walk through all blocks from the explosion center to the target block
 						BlockView.raycast(context, (ctx, pos) -> {
 							BlockState state = world.getBlockState(pos);
 
-							// place dirt if possible
-							if (state.getMaterial().isReplaceable()) {
-								world.setBlockState(pos, Blocks.DIRT.getDefaultState());
+							// skip over/trace through dirt
+							if (state.isOf(Blocks.DIRT)) {
 								return null;
 							}
 
-							// walk through dirt
-							if (state.isOf(Blocks.DIRT))
+							// test the block's shape for a collision
+							VoxelShape blockShape = ctx.getBlockShape(state, world, pos);
+							BlockHitResult hitResult = world.raycastBlock(ctx.getStart(), ctx.getEnd(), pos, blockShape, state);
+
+							// if nothing was hit
+							if (hitResult == null) {
+								// place dirt if possible
+								if (state.getMaterial().isReplaceable()) {
+									world.setBlockState(pos, Blocks.DIRT.getDefaultState());
+								}
+
+								// and continue
 								return null;
+							}
 
 							// else abort
 							return state;
