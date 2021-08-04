@@ -4,6 +4,8 @@
 	"package": "fourmisain.dirtnt.mixin",
 	"compatibilityLevel": "JAVA_16",
 	"mixins": [
+		"FireBlockAccessor",
+		"FireBlockMixin",
 		"FlintAndSteelDispenserBehaviorMixin",
 		"TntBlockMixin",
 		"TntEntityMixin"
