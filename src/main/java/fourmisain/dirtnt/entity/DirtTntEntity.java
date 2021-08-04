@@ -16,6 +16,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 
 public class DirtTntEntity extends TntEntity {
 	public static final int RADIUS = 3;
@@ -39,6 +40,8 @@ public class DirtTntEntity extends TntEntity {
 	public static void createDirtExplosion(Entity entity, World world) {
 		if (world.isClient) return;
 
+		// emitGameEvent seems to mainly be used for the Sculk Sensor
+		world.emitGameEvent(entity, GameEvent.EXPLODE, new BlockPos(entity.getX(), entity.getY(), entity.getZ()));
 		world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F);
 
 		// center explosion at the entity
