@@ -2,8 +2,9 @@
 	"required": true,
 	"minVersion": "0.8",
 	"package": "fourmisain.dirtnt.mixin",
-	"compatibilityLevel": "JAVA_8",
+	"compatibilityLevel": "JAVA_16",
 	"mixins": [
+		"FlintAndSteelDispenserBehaviorMixin",
 		"TntBlockMixin",
 		"TntEntityMixin"
 	],
