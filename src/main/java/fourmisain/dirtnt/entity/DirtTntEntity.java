@@ -15,7 +15,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 public class DirtTntEntity extends TntEntity {
-	public static final int RADIUS = 4;
+	public static final int RADIUS = 3;
 
 	public DirtTntEntity(EntityType<? extends TntEntity> entityType, World world) {
 		super(entityType, world);
@@ -48,7 +48,7 @@ public class DirtTntEntity extends TntEntity {
 				for (int z = -RADIUS; z <= RADIUS; z++) {
 					targetBlockPos.set(blockPos, x, y, z);
 
-					if (targetBlockPos.isWithinDistance(blockPos, RADIUS)) {
+					if (targetBlockPos.isWithinDistance(blockPos, RADIUS + 1)) {
 						// walk through all blocks from the explosion center to the target block
 						BlockView.raycast(blockCenter, Vec3d.ofCenter(targetBlockPos), null, (ctx, pos) -> {
 							BlockState state = world.getBlockState(pos);
