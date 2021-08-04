@@ -1,6 +1,6 @@
 ## DirTNT
 
-A Fabric Minecraft mod that adds Dirt TNT which can be used to fill small holes in the ground.
+A Fabric Minecraft mod that adds Dirt TNT for all your hole filling needs.
 - requires Minecraft 1.16-1.17, Fabric Loader and Fabric API
 - required on the server and client
 
