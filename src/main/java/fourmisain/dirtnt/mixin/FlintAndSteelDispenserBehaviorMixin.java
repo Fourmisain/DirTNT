@@ -3,7 +3,6 @@ package fourmisain.dirtnt.mixin;
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.Dirtable;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.dispenser.DispenserBehavior;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
