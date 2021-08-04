@@ -19,6 +19,10 @@ public abstract class TntEntityMixin implements Dirtable {
 		isDirty = true;
 	}
 
+	public boolean isDirty() {
+		return isDirty;
+	}
+
 	@Inject(method = "explode", at = @At("HEAD"), cancellable = true)
 	private void dirtyExplode(CallbackInfo ci) {
 		TntEntity self = (TntEntity) (Object) this;

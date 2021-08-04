@@ -41,11 +41,13 @@ public class DirtTntEntity extends TntEntity {
 
 		Vec3d blockCenter = Vec3d.ofCenter(blockPos);
 
+		BlockPos.Mutable targetBlockPos = new BlockPos.Mutable();
+
 		// for every 'target' block within a distance of RADIUS
 		for (int x = -RADIUS; x <= RADIUS; x++) {
 			for (int y = -RADIUS; y <= RADIUS; y++) {
 				for (int z = -RADIUS; z <= RADIUS; z++) {
-					BlockPos targetBlockPos = blockPos.add(x, y, z);
+					targetBlockPos.set(blockPos, x, y, z);
 
 					if (targetBlockPos.isWithinDistance(blockPos, RADIUS)) {
 						RaycastContext context = new RaycastContext(blockCenter, Vec3d.ofCenter(targetBlockPos),
