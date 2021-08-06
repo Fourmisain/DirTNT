@@ -27,11 +27,11 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
  * This is a tad more efficient though.
  */
 @Mixin(targets = "net.minecraft.block.dispenser.DispenserBehavior$10")
-public class FlintAndSteelDispenserBehaviorMixin {
+public abstract class FlintAndSteelDispenserBehaviorMixin {
 	@Inject(method = "dispenseSilently(Lnet/minecraft/util/math/BlockPointer;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;",
 		at = @At(value = "INVOKE", target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V"),
 		locals = LocalCapture.CAPTURE_FAILHARD)
-	protected void enableDispensedTntOverride(BlockPointer pointer, ItemStack stack, CallbackInfoReturnable<ItemStack> ci, World world, Direction direction, BlockPos blockPos, BlockState blockState) {
+	protected void enableDispensedTntDirtOverride(BlockPointer pointer, ItemStack stack, CallbackInfoReturnable<ItemStack> ci, World world, Direction direction, BlockPos blockPos, BlockState blockState) {
 		Dirtable block = (Dirtable) blockState.getBlock();
 		if (block.isDirty()) {
 			DirTnt.dirtyOverride = true;
@@ -41,7 +41,7 @@ public class FlintAndSteelDispenserBehaviorMixin {
 	@Inject(method = "dispenseSilently(Lnet/minecraft/util/math/BlockPointer;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;",
 		at = @At(value = "INVOKE", target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V",
 			shift = At.Shift.AFTER))
-	protected void disableDispensedTntOverride(BlockPointer pointer, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
+	protected void disableDispensedTntDirtOverride(BlockPointer pointer, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
 		DirTnt.dirtyOverride = false;
 	}
 }
