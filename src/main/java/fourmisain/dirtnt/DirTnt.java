@@ -2,6 +2,7 @@ package fourmisain.dirtnt;
 
 import fourmisain.dirtnt.block.DirtTntBlock;
 import fourmisain.dirtnt.entity.DirtTntEntity;
+import fourmisain.dirtnt.mixin.FireBlockAccessor;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -60,5 +61,8 @@ public class DirTnt implements ModInitializer {
             stack.decrement(1);
             return stack;
         });
+
+        FireBlockAccessor fireBlock = (FireBlockAccessor)Blocks.FIRE;
+        fireBlock.invokeRegisterFlammableBlock(DIRT_TNT_BLOCK, 15, 100);
     }
 }

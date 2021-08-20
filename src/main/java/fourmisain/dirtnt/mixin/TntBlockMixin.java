@@ -33,22 +33,22 @@ public abstract class TntBlockMixin implements Dirtable {
 	}
 
 	@Inject(method = {"onBlockAdded", "neighborUpdate", "onBreak", "onProjectileHit"}, at = @At("HEAD"))
-	private void enableDirtExplosion(CallbackInfo ci) {
+	private void enableTntDirtOverride(CallbackInfo ci) {
 		if (isDirty) DirTnt.dirtyOverride = true;
 	}
 
 	@Inject(method = {"onUse"}, at = @At("HEAD"))
-	private void enableDirtExplosion(CallbackInfoReturnable<ActionResult> cir) {
+	private void enableTntDirtOverride(CallbackInfoReturnable<ActionResult> cir) {
 		if (isDirty) DirTnt.dirtyOverride = true;
 	}
 
 	@Inject(method = {"onBlockAdded", "neighborUpdate", "onBreak", "onProjectileHit"}, at = @At("RETURN"))
-	private void disableDirtExplosion(CallbackInfo ci) {
+	private void disableTntDirtOverride(CallbackInfo ci) {
 		DirTnt.dirtyOverride = false;
 	}
 
 	@Inject(method = {"onUse"}, at = @At("RETURN"))
-	private void disableDirtExplosion(CallbackInfoReturnable<ActionResult> cir) {
+	private void disableTntDirtOverride(CallbackInfoReturnable<ActionResult> cir) {
 		DirTnt.dirtyOverride = false;
 	}
 
