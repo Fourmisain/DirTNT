@@ -23,8 +23,11 @@ public abstract class TntEntityRendererMixin implements Dirtable {
 	}
 
 	@ModifyArg(method = "render(Lnet/minecraft/entity/TntEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
-		at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/TntMinecartEntityRenderer;renderFlashingBlock(Lnet/minecraft/block/BlockState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IZ)V"),
-		index = 0)
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/client/render/entity/TntMinecartEntityRenderer;renderFlashingBlock(Lnet/minecraft/block/BlockState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IZ)V"
+			),
+			index = 0)
 	private BlockState replaceTntTexture(BlockState blockState) {
 		return isDirty ? DirTnt.DIRT_TNT_BLOCK.getDefaultState() : blockState;
 	}

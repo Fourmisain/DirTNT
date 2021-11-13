@@ -11,13 +11,13 @@ import net.minecraft.client.render.entity.TntEntityRenderer;
 @SuppressWarnings("ConstantConditions")
 @Environment(EnvType.CLIENT)
 public class DirTNTClient implements ClientModInitializer {
-    @Override
-    public void onInitializeClient() {
-        EntityRendererRegistry.register(DirTnt.DIRT_TNT_ENTITY_TYPE, (context) -> {
-            // use a dirty TNT renderer
-            Dirtable renderer = (Dirtable) new TntEntityRenderer(context);
-            renderer.makeDirty();
-            return (TntEntityRenderer) renderer;
-        });
-    }
+	@Override
+	public void onInitializeClient() {
+		EntityRendererRegistry.register(DirTnt.DIRT_TNT_ENTITY_TYPE, (context) -> {
+			// use a dirty TNT renderer
+			Dirtable renderer = (Dirtable) new TntEntityRenderer(context);
+			renderer.makeDirty();
+			return (TntEntityRenderer) renderer;
+		});
+	}
 }

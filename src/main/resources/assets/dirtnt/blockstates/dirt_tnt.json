@@ -1,7 +1,7 @@
 {
-  "variants": {
-    "": {
-      "model": "dirtnt:block/dirt_tnt"
-    }
-  }
+	"variants": {
+		"": {
+			"model": "dirtnt:block/dirt_tnt"
+		}
+	}
 }

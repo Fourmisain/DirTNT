@@ -17,18 +17,24 @@ import java.util.Random;
 
 @Mixin(FireBlock.class)
 public abstract class FireBlockMixin {
-	@Inject(method = "trySpreadingFire", at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V"),
-		locals = LocalCapture.CAPTURE_FAILHARD)
+	@Inject(method = "trySpreadingFire",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V"
+			),
+			locals = LocalCapture.CAPTURE_FAILHARD)
 	private void enableBurningTntDirtOverride(World world, BlockPos pos, int spreadFactor, Random rand, int currentAge, CallbackInfo ci, int i, BlockState state, Block block) {
 		if (((Dirtable) block).isDirty()) {
 			DirTnt.dirtyOverride = true;
 		}
 	}
 
-	@Inject(method = "trySpreadingFire", at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V",
-		shift = At.Shift.AFTER))
+	@Inject(method = "trySpreadingFire",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V",
+					shift = At.Shift.AFTER
+			))
 	private void disableBurningTntDirtOverride(World world, BlockPos pos, int spreadFactor, Random rand, int currentAge, CallbackInfo ci) {
 		DirTnt.dirtyOverride = false;
 	}

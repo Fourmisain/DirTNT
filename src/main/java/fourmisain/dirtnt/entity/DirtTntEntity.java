@@ -59,7 +59,7 @@ public class DirtTntEntity extends TntEntity {
 
 					if (targetBlockPos.isWithinDistance(centerBlockPos, RADIUS + 1)) {
 						RaycastContext context = new RaycastContext(centerVec, targetVec,
-							RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity);
+								RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity);
 
 						// walk through all blocks from the explosion center to the target block
 						BlockView.raycast(context.getStart(), context.getEnd(), context, (ctx, pos) -> {
