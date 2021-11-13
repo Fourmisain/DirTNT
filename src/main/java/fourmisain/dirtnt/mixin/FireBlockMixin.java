@@ -4,6 +4,7 @@ import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.Dirtable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.FireBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -24,9 +25,7 @@ public abstract class FireBlockMixin {
 			),
 			locals = LocalCapture.CAPTURE_FAILHARD)
 	private void enableBurningTntDirtOverride(World world, BlockPos pos, int spreadFactor, Random rand, int currentAge, CallbackInfo ci, int i, BlockState state, Block block) {
-		if (((Dirtable) block).isDirty()) {
-			DirTnt.dirtyOverride = true;
-		}
+		DirTnt.dirtyOverride = ((Dirtable) block).getDirtType();
 	}
 
 	@Inject(method = "trySpreadingFire",
@@ -36,6 +35,6 @@ public abstract class FireBlockMixin {
 					shift = At.Shift.AFTER
 			))
 	private void disableBurningTntDirtOverride(World world, BlockPos pos, int spreadFactor, Random rand, int currentAge, CallbackInfo ci) {
-		DirTnt.dirtyOverride = false;
+		DirTnt.dirtyOverride = Blocks.AIR;
 	}
 }

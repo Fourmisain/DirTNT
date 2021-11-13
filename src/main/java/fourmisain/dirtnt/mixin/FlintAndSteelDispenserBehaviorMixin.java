@@ -3,6 +3,7 @@ package fourmisain.dirtnt.mixin;
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.Dirtable;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
@@ -35,10 +36,7 @@ public abstract class FlintAndSteelDispenserBehaviorMixin {
 			),
 			locals = LocalCapture.CAPTURE_FAILHARD)
 	protected void enableDispensedTntDirtOverride(BlockPointer pointer, ItemStack stack, CallbackInfoReturnable<ItemStack> ci, World world, Direction direction, BlockPos blockPos, BlockState blockState) {
-		Dirtable block = (Dirtable) blockState.getBlock();
-		if (block.isDirty()) {
-			DirTnt.dirtyOverride = true;
-		}
+		DirTnt.dirtyOverride = ((Dirtable) blockState.getBlock()).getDirtType();
 	}
 
 	@Inject(method = "dispenseSilently(Lnet/minecraft/util/math/BlockPointer;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;",
@@ -48,6 +46,6 @@ public abstract class FlintAndSteelDispenserBehaviorMixin {
 					shift = At.Shift.AFTER
 			))
 	protected void disableDispensedTntDirtOverride(BlockPointer pointer, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
-		DirTnt.dirtyOverride = false;
+		DirTnt.dirtyOverride = Blocks.AIR;
 	}
 }

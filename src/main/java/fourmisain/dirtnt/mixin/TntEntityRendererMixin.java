@@ -4,7 +4,9 @@ import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.Dirtable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.render.entity.TntEntityRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -16,10 +18,16 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 @Mixin(TntEntityRenderer.class)
 public abstract class TntEntityRendererMixin implements Dirtable {
 	@Unique
-	private boolean isDirty = false;
+	private Block dirtType = Blocks.AIR;
 
-	public void makeDirty() {
-		isDirty = true;
+	@Override
+	public void makeDirty(Block dirtType) {
+		this.dirtType = dirtType;
+	}
+
+	@Override
+	public Block getDirtType() {
+		return this.dirtType;
 	}
 
 	@ModifyArg(method = "render(Lnet/minecraft/entity/TntEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
@@ -29,6 +37,6 @@ public abstract class TntEntityRendererMixin implements Dirtable {
 			),
 			index = 0)
 	private BlockState replaceTntTexture(BlockState blockState) {
-		return isDirty ? DirTnt.DIRT_TNT_BLOCK.getDefaultState() : blockState;
+		return isDirty() ? DirTnt.BLOCK_MAP.get(dirtType).getDefaultState() : blockState;
 	}
 }

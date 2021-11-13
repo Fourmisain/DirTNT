@@ -6,7 +6,9 @@ import fourmisain.dirtnt.mixin.FireBlockAccessor;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.DispenserBlock;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
@@ -23,15 +25,21 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class DirTnt implements ModInitializer {
 	public static final String MOD_ID = "dirtnt";
 
-	// used to override TntBlock.primeTnt() behavior
-	public static boolean dirtyOverride = false;
+	public static final List<Block> DIRT_TYPES = List.of(Blocks.DIRT, Blocks.GRASS_BLOCK, Blocks.STONE, Blocks.COBBLESTONE, Blocks.DIAMOND_BLOCK);
 
-	public static Block DIRT_TNT_BLOCK;
-	public static Item DIRT_TNT_ITEM;
-	public static EntityType<DirtTntEntity> DIRT_TNT_ENTITY_TYPE;
+	// used to override TntBlock.primeTnt() behavior
+	public static Block dirtyOverride = Blocks.AIR;
+
+	public static Map<Block, Block> BLOCK_MAP = new HashMap<>();
+	public static Map<Block, Item> ITEM_MAP = new HashMap<>();
+	public static Map<Block, EntityType<DirtTntEntity>> ENTITY_TYPE_MAP = new HashMap<>();
 
 	public static Identifier id(String id) {
 		return new Identifier(MOD_ID, id);
@@ -39,31 +47,44 @@ public class DirTnt implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		DIRT_TNT_BLOCK = Registry.register(Registry.BLOCK, id("dirt_tnt"), new DirtTntBlock());
+		FireBlockAccessor fireBlock = (FireBlockAccessor)Blocks.FIRE;
 
-		DIRT_TNT_ITEM = Registry.register(Registry.ITEM, id("dirt_tnt"), new BlockItem(DIRT_TNT_BLOCK, new FabricItemSettings().group(ItemGroup.REDSTONE)));
+		for (Block dirtType : DIRT_TYPES) {
+			Identifier id = id(Registry.BLOCK.getId(dirtType).getPath() + "_tnt");
 
-		DIRT_TNT_ENTITY_TYPE = Registry.register(Registry.ENTITY_TYPE, id("dirt_tnt"), FabricEntityTypeBuilder.create()
-				.<DirtTntEntity>entityFactory(DirtTntEntity::new)
+			DirtTntBlock block = Registry.register(Registry.BLOCK, id, new DirtTntBlock(dirtType));
+			BlockItem item = Registry.register(Registry.ITEM, id, new BlockItem(block, new FabricItemSettings().group(ItemGroup.REDSTONE)));
+			EntityType<DirtTntEntity> entityType = Registry.register(Registry.ENTITY_TYPE, id, getEntityType(dirtType));
+
+			BLOCK_MAP.put(dirtType, block);
+			ITEM_MAP.put(dirtType, item);
+			ENTITY_TYPE_MAP.put(dirtType, entityType);
+
+			DispenserBlock.registerBehavior(item, (pointer, stack) -> DirTnt.dispense(dirtType, pointer, stack));
+
+			fireBlock.invokeRegisterFlammableBlock(block, 15, 100);
+		}
+	}
+
+	private static ItemStack dispense(Block dirtType, BlockPointer pointer, ItemStack stack) {
+		World world = pointer.getWorld();
+		BlockPos pos = pointer.getPos().offset(pointer.getBlockState().get(DispenserBlock.FACING));
+		DirtTntEntity tntEntity = new DirtTntEntity(dirtType, world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+		world.spawnEntity(tntEntity);
+		world.playSound(null, tntEntity.getX(), tntEntity.getY(), tntEntity.getZ(), SoundEvents.ENTITY_TNT_PRIMED, SoundCategory.BLOCKS, 1.0F, 1.0F);
+		world.emitGameEvent(null, GameEvent.ENTITY_PLACE, pos);
+		stack.decrement(1);
+		return stack;
+	}
+
+	private EntityType<DirtTntEntity> getEntityType(Block dirtType) {
+		return FabricEntityTypeBuilder.create()
+				.<DirtTntEntity>entityFactory((entityType, world) -> new DirtTntEntity(dirtType, entityType, world))
 				.spawnGroup(SpawnGroup.MISC)
 				.fireImmune()
 				.dimensions(EntityDimensions.fixed(0.98F, 0.98F))
 				.trackRangeBlocks(10)
 				.trackedUpdateRate(10)
-				.build());
-
-		DispenserBlock.registerBehavior(DirTnt.DIRT_TNT_ITEM, (BlockPointer pointer, ItemStack stack) -> {
-			World world = pointer.getWorld();
-			BlockPos pos = pointer.getPos().offset(pointer.getBlockState().get(DispenserBlock.FACING));
-			DirtTntEntity tntEntity = new DirtTntEntity(world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
-			world.spawnEntity(tntEntity);
-			world.playSound(null, tntEntity.getX(), tntEntity.getY(), tntEntity.getZ(), SoundEvents.ENTITY_TNT_PRIMED, SoundCategory.BLOCKS, 1.0F, 1.0F);
-			world.emitGameEvent(null, GameEvent.ENTITY_PLACE, pos);
-			stack.decrement(1);
-			return stack;
-		});
-
-		FireBlockAccessor fireBlock = (FireBlockAccessor) Blocks.FIRE;
-		fireBlock.invokeRegisterFlammableBlock(DIRT_TNT_BLOCK, 15, 100);
+				.build();
 	}
 }

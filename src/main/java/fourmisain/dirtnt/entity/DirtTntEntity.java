@@ -2,8 +2,8 @@ package fourmisain.dirtnt.entity;
 
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.Dirtable;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.TntEntity;
@@ -21,13 +21,13 @@ import net.minecraft.world.event.GameEvent;
 public class DirtTntEntity extends TntEntity {
 	public static final int RADIUS = 3;
 
-	public DirtTntEntity(EntityType<? extends TntEntity> entityType, World world) {
+	public DirtTntEntity(Block dirtType, EntityType<? extends TntEntity> entityType, World world) {
 		super(entityType, world);
-		((Dirtable) this).makeDirty();
+		((Dirtable) this).makeDirty(dirtType);
 	}
 
-	public DirtTntEntity(World world, double x, double y, double z) {
-		this(DirTnt.DIRT_TNT_ENTITY_TYPE, world);
+	public DirtTntEntity(Block dirtType, World world, double x, double y, double z) {
+		this(dirtType, DirTnt.ENTITY_TYPE_MAP.get(DirTnt.dirtyOverride), world); // TODO does this work
 		this.setPosition(x, y, z);
 		double angle = world.random.nextDouble() * 2*Math.PI;
 		this.setVelocity(-Math.sin(angle) * 0.02, 0.2, -Math.cos(angle) * 0.02);
@@ -37,7 +37,7 @@ public class DirtTntEntity extends TntEntity {
 		this.prevZ = z;
 	}
 
-	public static void createDirtExplosion(Entity entity, World world) {
+	public static void createDirtExplosion(Block dirtType, Entity entity, World world) {
 		if (world.isClient) return;
 
 		// emitGameEvent seems to mainly be used for the Sculk Sensor
@@ -66,7 +66,7 @@ public class DirtTntEntity extends TntEntity {
 							BlockState state = world.getBlockState(pos);
 
 							// skip over/trace through dirt
-							if (state.isOf(Blocks.DIRT)) {
+							if (state.isOf(dirtType)) {
 								return null;
 							}
 
@@ -78,7 +78,7 @@ public class DirtTntEntity extends TntEntity {
 							if (hitResult == null) {
 								// place dirt if possible
 								if (state.getMaterial().isReplaceable()) {
-									world.setBlockState(pos, Blocks.DIRT.getDefaultState());
+									world.setBlockState(pos, dirtType.getDefaultState());
 								}
 
 								// and continue
