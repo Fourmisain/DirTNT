@@ -7,8 +7,11 @@
 		"FireBlockAccessor",
 		"FireBlockMixin",
 		"FlintAndSteelDispenserBehaviorMixin",
+		"TagGroupLoaderMixin",
 		"TntBlockMixin",
-		"TntEntityMixin"
+		"TntEntityMixin",
+		"autogen.SpriteAccessor",
+		"autogen.SpriteAtlasTextureMixin"
 	],
 	"client": [
 		"TntEntityRendererMixin"

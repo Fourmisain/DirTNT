@@ -24,15 +24,23 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DirTnt implements ModInitializer {
 	public static final String MOD_ID = "dirtnt";
+	public static Logger LOGGER = LogManager.getLogger(MOD_ID);
 
-	public static final List<Block> DIRT_TYPES = List.of(Blocks.DIRT, Blocks.GRASS_BLOCK, Blocks.STONE, Blocks.COBBLESTONE, Blocks.DIAMOND_BLOCK);
+	// TODO autogen loot tables
+
+	// TODO use Identifiers
+	public static final List<Block> DIRT_TYPES = Registry.BLOCK.stream().collect(Collectors.toList());
+	// // Blocks.DIRT, Blocks.STONE, Blocks.COBBLESTONE
 
 	// used to override TntBlock.primeTnt() behavior
 	public static Block dirtyOverride = Blocks.AIR;
@@ -50,23 +58,23 @@ public class DirTnt implements ModInitializer {
 		FireBlockAccessor fireBlock = (FireBlockAccessor)Blocks.FIRE;
 
 		for (Block dirtType : DIRT_TYPES) {
-			Identifier id = id(Registry.BLOCK.getId(dirtType).getPath() + "_tnt");
+			Identifier id = DirTnt.id(Registry.BLOCK.getId(dirtType).getPath() + "_tnt");
 
 			DirtTntBlock block = Registry.register(Registry.BLOCK, id, new DirtTntBlock(dirtType));
 			BlockItem item = Registry.register(Registry.ITEM, id, new BlockItem(block, new FabricItemSettings().group(ItemGroup.REDSTONE)));
-			EntityType<DirtTntEntity> entityType = Registry.register(Registry.ENTITY_TYPE, id, getEntityType(dirtType));
+			EntityType<DirtTntEntity> entityType = Registry.register(Registry.ENTITY_TYPE, id, createDirtTntEntityType(dirtType));
 
 			BLOCK_MAP.put(dirtType, block);
 			ITEM_MAP.put(dirtType, item);
 			ENTITY_TYPE_MAP.put(dirtType, entityType);
 
-			DispenserBlock.registerBehavior(item, (pointer, stack) -> DirTnt.dispense(dirtType, pointer, stack));
+			DispenserBlock.registerBehavior(item, (pointer, stack) -> dispenseDirtTnt(dirtType, pointer, stack));
 
 			fireBlock.invokeRegisterFlammableBlock(block, 15, 100);
 		}
 	}
 
-	private static ItemStack dispense(Block dirtType, BlockPointer pointer, ItemStack stack) {
+	private static ItemStack dispenseDirtTnt(Block dirtType, BlockPointer pointer, ItemStack stack) {
 		World world = pointer.getWorld();
 		BlockPos pos = pointer.getPos().offset(pointer.getBlockState().get(DispenserBlock.FACING));
 		DirtTntEntity tntEntity = new DirtTntEntity(dirtType, world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
@@ -77,7 +85,7 @@ public class DirTnt implements ModInitializer {
 		return stack;
 	}
 
-	private EntityType<DirtTntEntity> getEntityType(Block dirtType) {
+	private EntityType<DirtTntEntity> createDirtTntEntityType(Block dirtType) {
 		return FabricEntityTypeBuilder.create()
 				.<DirtTntEntity>entityFactory((entityType, world) -> new DirtTntEntity(dirtType, entityType, world))
 				.spawnGroup(SpawnGroup.MISC)
