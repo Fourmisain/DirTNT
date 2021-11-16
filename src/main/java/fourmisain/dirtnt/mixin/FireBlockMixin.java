@@ -4,7 +4,6 @@ import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.Dirtable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.FireBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -35,6 +34,6 @@ public abstract class FireBlockMixin {
 					shift = At.Shift.AFTER
 			))
 	private void disableBurningTntDirtOverride(World world, BlockPos pos, int spreadFactor, Random rand, int currentAge, CallbackInfo ci) {
-		DirTnt.dirtyOverride = Blocks.AIR;
+		DirTnt.dirtyOverride = null;
 	}
 }

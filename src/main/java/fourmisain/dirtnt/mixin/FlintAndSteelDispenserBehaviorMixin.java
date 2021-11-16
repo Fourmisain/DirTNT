@@ -3,7 +3,6 @@ package fourmisain.dirtnt.mixin;
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.Dirtable;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
@@ -46,6 +45,6 @@ public abstract class FlintAndSteelDispenserBehaviorMixin {
 					shift = At.Shift.AFTER
 			))
 	protected void disableDispensedTntDirtOverride(BlockPointer pointer, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
-		DirTnt.dirtyOverride = Blocks.AIR;
+		DirTnt.dirtyOverride = null;
 	}
 }

@@ -1,13 +1,12 @@
 package fourmisain.dirtnt;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
+import net.minecraft.util.Identifier;
 
 public interface Dirtable {
-	void makeDirty(Block type);
-	Block getDirtType();
+	void makeDirty(Identifier dirtType);
+	Identifier getDirtType();
 
 	default boolean isDirty() {
-		return getDirtType() != Blocks.AIR;
+		return getDirtType() != null;
 	}
 }

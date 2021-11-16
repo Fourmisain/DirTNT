@@ -27,10 +27,10 @@ import net.minecraft.world.event.GameEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class DirTnt implements ModInitializer {
 	public static final String MOD_ID = "dirtnt";
@@ -38,16 +38,15 @@ public class DirTnt implements ModInitializer {
 
 	// TODO autogen loot tables
 
-	// TODO use Identifiers
-	public static final List<Block> DIRT_TYPES = Registry.BLOCK.stream().collect(Collectors.toList());
+	public static final List<Identifier> DIRT_TYPES = new ArrayList<>(Registry.BLOCK.getIds());
 	// // Blocks.DIRT, Blocks.STONE, Blocks.COBBLESTONE
 
 	// used to override TntBlock.primeTnt() behavior
-	public static Block dirtyOverride = Blocks.AIR;
+	public static Identifier dirtyOverride = null;
 
-	public static Map<Block, Block> BLOCK_MAP = new HashMap<>();
-	public static Map<Block, Item> ITEM_MAP = new HashMap<>();
-	public static Map<Block, EntityType<DirtTntEntity>> ENTITY_TYPE_MAP = new HashMap<>();
+	public static Map<Identifier, Block> BLOCK_MAP = new HashMap<>();
+	public static Map<Identifier, Item> ITEM_MAP = new HashMap<>();
+	public static Map<Identifier, EntityType<DirtTntEntity>> ENTITY_TYPE_MAP = new HashMap<>();
 
 	public static Identifier id(String id) {
 		return new Identifier(MOD_ID, id);
@@ -57,8 +56,9 @@ public class DirTnt implements ModInitializer {
 	public void onInitialize() {
 		FireBlockAccessor fireBlock = (FireBlockAccessor)Blocks.FIRE;
 
-		for (Block dirtType : DIRT_TYPES) {
-			Identifier id = DirTnt.id(Registry.BLOCK.getId(dirtType).getPath() + "_tnt");
+		for (Identifier dirtType : DIRT_TYPES) {
+			// TODO maybe add namespace for modded dirtTypes
+			Identifier id = DirTnt.id(dirtType.getPath() + "_tnt");
 
 			DirtTntBlock block = Registry.register(Registry.BLOCK, id, new DirtTntBlock(dirtType));
 			BlockItem item = Registry.register(Registry.ITEM, id, new BlockItem(block, new FabricItemSettings().group(ItemGroup.REDSTONE)));
@@ -74,7 +74,7 @@ public class DirTnt implements ModInitializer {
 		}
 	}
 
-	private static ItemStack dispenseDirtTnt(Block dirtType, BlockPointer pointer, ItemStack stack) {
+	private static ItemStack dispenseDirtTnt(Identifier dirtType, BlockPointer pointer, ItemStack stack) {
 		World world = pointer.getWorld();
 		BlockPos pos = pointer.getPos().offset(pointer.getBlockState().get(DispenserBlock.FACING));
 		DirtTntEntity tntEntity = new DirtTntEntity(dirtType, world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
@@ -85,7 +85,7 @@ public class DirTnt implements ModInitializer {
 		return stack;
 	}
 
-	private EntityType<DirtTntEntity> createDirtTntEntityType(Block dirtType) {
+	private EntityType<DirtTntEntity> createDirtTntEntityType(Identifier dirtType) {
 		return FabricEntityTypeBuilder.create()
 				.<DirtTntEntity>entityFactory((entityType, world) -> new DirtTntEntity(dirtType, entityType, world))
 				.spawnGroup(SpawnGroup.MISC)

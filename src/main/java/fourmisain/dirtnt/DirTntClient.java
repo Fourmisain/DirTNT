@@ -7,10 +7,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.minecraft.block.Block;
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 
@@ -32,14 +30,12 @@ public class DirTntClient implements ClientModInitializer {
 			return null;
 		});
 
-		for (Block dirtType : DIRT_TYPES) {
+		for (Identifier dirtType : DIRT_TYPES) {
 			EntityRendererRegistry.register(DirTnt.ENTITY_TYPE_MAP.get(dirtType), (context) -> new DirtTntEntityRenderer(dirtType, context));
 
-			Identifier dirtId = Registry.BLOCK.getId(dirtType);
-
-			API.addRecipe(new DirtTntSpriteRecipe(dirtId, "side"));
-			API.addRecipe(new DirtTntSpriteRecipe(dirtId, "top"));
-			API.addRecipe(new DirtTntSpriteRecipe(dirtId, "bottom"));
+			API.addRecipe(new DirtTntSpriteRecipe(dirtType, "side"));
+			API.addRecipe(new DirtTntSpriteRecipe(dirtType, "top"));
+			API.addRecipe(new DirtTntSpriteRecipe(dirtType, "bottom"));
 		}
 	}
 

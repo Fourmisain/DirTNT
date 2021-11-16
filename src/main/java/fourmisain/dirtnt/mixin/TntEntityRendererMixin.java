@@ -4,10 +4,9 @@ import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.Dirtable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.render.entity.TntEntityRenderer;
+import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,15 +17,15 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 @Mixin(TntEntityRenderer.class)
 public abstract class TntEntityRendererMixin implements Dirtable {
 	@Unique
-	private Block dirtType = Blocks.AIR;
+	private Identifier dirtType = null;
 
 	@Override
-	public void makeDirty(Block dirtType) {
+	public void makeDirty(Identifier dirtType) {
 		this.dirtType = dirtType;
 	}
 
 	@Override
-	public Block getDirtType() {
+	public Identifier getDirtType() {
 		return this.dirtType;
 	}
 

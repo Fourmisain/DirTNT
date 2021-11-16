@@ -2,9 +2,8 @@ package fourmisain.dirtnt.mixin;
 
 import fourmisain.dirtnt.Dirtable;
 import fourmisain.dirtnt.entity.DirtTntEntity;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.TntEntity;
+import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,15 +14,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(TntEntity.class)
 public abstract class TntEntityMixin implements Dirtable {
 	@Unique
-	private Block dirtType = Blocks.AIR;
+	private Identifier dirtType = null;
 
 	@Override
-	public void makeDirty(Block dirtType) {
+	public void makeDirty(Identifier dirtType) {
 		this.dirtType = dirtType;
 	}
 
 	@Override
-	public Block getDirtType() {
+	public Identifier getDirtType() {
 		return dirtType;
 	}
 

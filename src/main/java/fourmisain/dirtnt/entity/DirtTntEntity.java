@@ -9,9 +9,11 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.TntEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.RaycastContext;
@@ -21,12 +23,12 @@ import net.minecraft.world.event.GameEvent;
 public class DirtTntEntity extends TntEntity {
 	public static final int RADIUS = 3;
 
-	public DirtTntEntity(Block dirtType, EntityType<? extends TntEntity> entityType, World world) {
+	public DirtTntEntity(Identifier dirtType, EntityType<? extends TntEntity> entityType, World world) {
 		super(entityType, world);
 		((Dirtable) this).makeDirty(dirtType);
 	}
 
-	public DirtTntEntity(Block dirtType, World world, double x, double y, double z) {
+	public DirtTntEntity(Identifier dirtType, World world, double x, double y, double z) {
 		this(dirtType, DirTnt.ENTITY_TYPE_MAP.get(DirTnt.dirtyOverride), world); // TODO does this work
 		this.setPosition(x, y, z);
 		double angle = world.random.nextDouble() * 2*Math.PI;
@@ -37,7 +39,7 @@ public class DirtTntEntity extends TntEntity {
 		this.prevZ = z;
 	}
 
-	public static void createDirtExplosion(Block dirtType, Entity entity, World world) {
+	public static void createDirtExplosion(Identifier dirtType, Entity entity, World world) {
 		if (world.isClient) return;
 
 		// emitGameEvent seems to mainly be used for the Sculk Sensor
@@ -49,6 +51,8 @@ public class DirtTntEntity extends TntEntity {
 		Vec3d centerVec = entity.getBoundingBox().getCenter();
 
 		BlockPos.Mutable targetBlockPos = new BlockPos.Mutable();
+
+		Block dirtBlock = Registry.BLOCK.get(dirtType); // TODO do a check?
 
 		// for every 'target' block within a distance of RADIUS
 		for (int x = -RADIUS; x <= RADIUS; x++) {
@@ -66,7 +70,7 @@ public class DirtTntEntity extends TntEntity {
 							BlockState state = world.getBlockState(pos);
 
 							// skip over/trace through dirt
-							if (state.isOf(dirtType)) {
+							if (state.isOf(dirtBlock)) {
 								return null;
 							}
 
@@ -78,7 +82,7 @@ public class DirtTntEntity extends TntEntity {
 							if (hitResult == null) {
 								// place dirt if possible
 								if (state.getMaterial().isReplaceable()) {
-									world.setBlockState(pos, dirtType.getDefaultState());
+									world.setBlockState(pos, dirtBlock.getDefaultState());
 								}
 
 								// and continue

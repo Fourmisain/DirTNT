@@ -3,13 +3,12 @@ package fourmisain.dirtnt.mixin;
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.Dirtable;
 import fourmisain.dirtnt.entity.DirtTntEntity;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.TntBlock;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
@@ -24,15 +23,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(TntBlock.class)
 public abstract class TntBlockMixin implements Dirtable {
 	@Unique
-	private Block dirtType = Blocks.AIR;
+	private Identifier dirtType = null;
 
 	@Override
-	public void makeDirty(Block type) {
-		dirtType = type;
+	public void makeDirty(Identifier dirtType) {
+		this.dirtType = dirtType;
 	}
 
 	@Override
-	public Block getDirtType() {
+	public Identifier getDirtType() {
 		return dirtType;
 	}
 
@@ -48,17 +47,17 @@ public abstract class TntBlockMixin implements Dirtable {
 
 	@Inject(method = {"onBlockAdded", "neighborUpdate", "onBreak", "onProjectileHit"}, at = @At("RETURN"))
 	private void disableTntDirtOverride(CallbackInfo ci) {
-		DirTnt.dirtyOverride = Blocks.AIR;
+		DirTnt.dirtyOverride = null;
 	}
 
 	@Inject(method = {"onUse"}, at = @At("RETURN"))
 	private void disableTntDirtOverride(CallbackInfoReturnable<ActionResult> cir) {
-		DirTnt.dirtyOverride = Blocks.AIR;
+		DirTnt.dirtyOverride = null;
 	}
 
 	@Inject(method = "primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/LivingEntity;)V", at = @At("HEAD"), cancellable = true)
 	private static void primeDirtTnt(World world, BlockPos pos, LivingEntity igniter, CallbackInfo ci) {
-		if (DirTnt.dirtyOverride != Blocks.AIR && !world.isClient) {
+		if (DirTnt.dirtyOverride != null && !world.isClient) {
 			DirtTntEntity tntEntity = new DirtTntEntity(DirTnt.dirtyOverride, world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
 			world.spawnEntity(tntEntity);
 			world.playSound(null, tntEntity.getX(), tntEntity.getY(), tntEntity.getZ(), SoundEvents.ENTITY_TNT_PRIMED, SoundCategory.BLOCKS, 1.0F, 1.0F);
