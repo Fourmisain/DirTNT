@@ -9,11 +9,13 @@ import net.minecraft.client.texture.TextureStitcher;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
+import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -51,6 +53,21 @@ import java.util.stream.Stream;
 public abstract class SpriteAtlasTextureMixin {
 	@Shadow
 	public abstract Identifier getId();
+
+	@Dynamic("runAsync lambda in loadSprites(Lnet/minecraft/resource/ResourceManager;Ljava/util/Set;)Ljava/util/Collection;")
+	@Inject(method = "method_18160", at = @At("HEAD"), cancellable = true, remap = false)
+	private void dirtnt$skipSpriteInfoLoading(Identifier identifier, ResourceManager resourceManager, Queue<Sprite.Info> queue, CallbackInfo ci) {
+		List<SpriteRecipe> recipes = API.recipeMap.get(getId());
+		if (recipes == null) return;
+
+		// TODO use a Set afterall?
+		for (var recipe : recipes) {
+			if (recipe.getSpriteId().equals(identifier)) {
+				DirTnt.LOGGER.debug("skip loading sprite info {}", recipe.getSpriteId());
+				ci.cancel();
+			}
+		}
+	}
 
 	@Inject(method = "loadSprites(Lnet/minecraft/resource/ResourceManager;Ljava/util/Set;)Ljava/util/Collection;",
 			at = @At("RETURN"))
