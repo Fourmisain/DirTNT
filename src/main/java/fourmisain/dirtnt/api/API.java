@@ -1,6 +1,8 @@
 package fourmisain.dirtnt.api;
 
 import fourmisain.dirtnt.mixin.autogen.SpriteAccessor;
+import fourmisain.dirtnt.mixin.autogen.SpriteInfoAccessor;
+import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.util.Identifier;
@@ -16,6 +18,10 @@ public class API {
 
 	public static NativeImage getImage(@NotNull Sprite sprite) {
 		return ((SpriteAccessor) sprite).getImages()[0];
+	}
+
+	public static AnimationResourceMetadata getAnimationData(Sprite.Info spriteInfo) {
+		return ((SpriteInfoAccessor) (Object) spriteInfo).getAnimationData();
 	}
 
 	public static Identifier getTexturePath(Identifier id) {

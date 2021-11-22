@@ -3,7 +3,6 @@ package fourmisain.dirtnt.client;
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.api.API;
 import fourmisain.dirtnt.api.SpriteRecipe;
-import net.minecraft.client.resource.metadata.AnimationFrameResourceMetadata;
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.MissingSprite;
 import net.minecraft.client.texture.NativeImage;
@@ -14,11 +13,11 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 
 public class DirtTntSpriteRecipe implements SpriteRecipe {
 	private int w, h;
+	private AnimationResourceMetadata animationData;
 	private NativeImage texture;
 
 	private final String side;
@@ -47,6 +46,7 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 		DirTnt.LOGGER.debug("collectSpriteInfo() {} {}x{}", info.getId(), info.getWidth(), info.getHeight());
 		w = Math.max(w, info.getWidth());
 		h = Math.max(h, info.getHeight());
+		animationData = API.getAnimationData(info);
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 	@Override
 	public Sprite.Info generateSpriteInfo() {
 		DirTnt.LOGGER.debug("generateSpriteInfo() {} {}x{}", getSpriteId(), w, h);
-		return new Sprite.Info(getSpriteId(), w, h, new AnimationResourceMetadata(List.of(new AnimationFrameResourceMetadata(0, -1)), w, h, 1, false));
+		return new Sprite.Info(getSpriteId(), w, h, animationData);
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 
 	@Override
 	public NativeImage generateImage(ResourceManager resourceManager) {
-		DirTnt.LOGGER.debug("generateImage() {}x{}", texture.getWidth(), texture.getHeight()); // TODO can be 16x288?
+		DirTnt.LOGGER.debug("generateImage() {}x{}", texture.getWidth(), texture.getHeight());
 		NativeImage image = new NativeImage(texture.getWidth(), texture.getHeight(), false);
 		image.copyFrom(texture);
 
@@ -83,12 +83,27 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 			return MissingSprite.getMissingSpriteTexture().getImage();
 		}
 
-		// blend textures together
-		int xScale = image.getWidth() / 16;
-		int yScale = image.getHeight() / 16;
-		for (int y = 0; y < image.getHeight(); y++) {
-			for (int x = 0; x < image.getWidth(); x++) {
-				image.blend(x, y, templateTexture.getColor(x / xScale, y / yScale));
+		// frame dimensions
+		int fw = animationData.getWidth(w);
+		int fh = animationData.getHeight(h);
+
+		// scaling factors
+		int xScale = fw / 16;
+		int yScale = fh / 16;
+
+		int xFrames = image.getWidth() / animationData.getWidth(w);
+		int yFrames = image.getHeight() / animationData.getHeight(h);
+
+		// for each frame
+		for (int j = 0; j < yFrames; j++) {
+			for (int i = 0; i < xFrames; i++) {
+				// blend textures together
+				for (int y = 0; y < fh; y++) {
+					for (int x = 0; x < fw; x++) {
+						image.blend(i * fw + x, j * fh + y, templateTexture.getColor(x / xScale, y / yScale));
+					}
+				}
+
 			}
 		}
 

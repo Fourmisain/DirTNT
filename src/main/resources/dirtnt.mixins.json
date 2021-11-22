@@ -11,7 +11,8 @@
 		"TntBlockMixin",
 		"TntEntityMixin",
 		"autogen.SpriteAccessor",
-		"autogen.SpriteAtlasTextureMixin"
+		"autogen.SpriteAtlasTextureMixin",
+		"autogen.SpriteInfoAccessor"
 	],
 	"client": [
 		"TntEntityRendererMixin"
