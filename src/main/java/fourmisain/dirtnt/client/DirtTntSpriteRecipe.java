@@ -22,14 +22,14 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 	private NativeImage texture;
 
 	private final String side;
-	private final Identifier ID;
+	private final Identifier id;
 	private final Identifier dirtTexture;
 
 	public DirtTntSpriteRecipe(Identifier dirtType, String side) {
 		this.side = side;
-		String dirtName = dirtType.getPath();
-		this.ID = DirTnt.id("block/" + dirtName + "_tnt_" + side);
-		this.dirtTexture = new Identifier(dirtType.getNamespace(), "block/" + dirtName);
+		this.dirtTexture = new Identifier(dirtType.getNamespace(), "block/" + dirtType.getPath());
+		Identifier blockId = DirTnt.getDirtTntBlockId(dirtType);
+		this.id = new Identifier(blockId.getNamespace(), "block/" + blockId.getPath() + "_" + side);
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 
 	@Override
 	public Identifier getSpriteId() {
-		return ID;
+		return id;
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 
 		//load template texture
 		NativeImage templateTexture;
-		Identifier templateId = API.getTexturePath(new Identifier("dirtnt", "block/tnt_" + side + "_template"));
+		Identifier templateId = API.getTexturePath(DirTnt.id("block/tnt_" + side + "_template"));
 
 		try (Resource res = resourceManager.getResource(templateId)) {
 			templateTexture = NativeImage.read(res.getInputStream());

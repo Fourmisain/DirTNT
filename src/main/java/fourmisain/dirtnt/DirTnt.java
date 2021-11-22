@@ -52,13 +52,23 @@ public class DirTnt implements ModInitializer {
 		return new Identifier(MOD_ID, id);
 	}
 
+	/** Block and Item ID */
+	public static Identifier getDirtTntBlockId(Identifier dirtType) {
+		String namespace = dirtType.getNamespace();
+
+		if (namespace.equals("minecraft")) {
+			return DirTnt.id(String.format("%s_tnt", dirtType.getPath()));
+		} else {
+			return DirTnt.id(String.format("%s_%s_tnt", namespace, dirtType.getPath()));
+		}
+	}
+
 	@Override
 	public void onInitialize() {
 		FireBlockAccessor fireBlock = (FireBlockAccessor)Blocks.FIRE;
 
 		for (Identifier dirtType : DIRT_TYPES) {
-			// TODO maybe add namespace for modded dirtTypes
-			Identifier id = DirTnt.id(dirtType.getPath() + "_tnt");
+			Identifier id = getDirtTntBlockId(dirtType);
 
 			DirtTntBlock block = Registry.register(Registry.BLOCK, id, new DirtTntBlock(dirtType));
 			BlockItem item = Registry.register(Registry.ITEM, id, new BlockItem(block, new FabricItemSettings().group(ItemGroup.REDSTONE)));

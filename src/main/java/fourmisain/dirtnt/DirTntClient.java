@@ -16,15 +16,10 @@ import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 public class DirTntClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-
 		ModelLoadingRegistry.INSTANCE.registerVariantProvider((manager) -> (modelId, context) -> {
 			if (modelId.getNamespace().equals(DirTnt.MOD_ID)) {
-				// get block from modelId
-				String path = modelId.getPath();
-				if (!path.endsWith("_tnt")) throw new AssertionError();
-				String dirtName = path.substring(0, path.length() - "_tnt".length());
-
-				return JsonUnbakedModel.deserialize(getBlockModelJson(dirtName));
+				DirTnt.LOGGER.debug("register model variant {}", modelId);
+				return JsonUnbakedModel.deserialize(getCubeBottomTopBlockModelJson(modelId));
 			}
 
 			return null;
@@ -39,16 +34,19 @@ public class DirTntClient implements ClientModInitializer {
 		}
 	}
 
-	public static String getBlockModelJson(String dirtName) {
+	public static String getCubeBottomTopBlockModelJson(Identifier modelId) {
+		String namespace = modelId.getNamespace();
+		String path = modelId.getPath();
+
 		return String.format("""
 			{
 				"parent": "minecraft:block/cube_bottom_top",
 				"textures": {
-					"top": "dirtnt:block/%s_tnt_top",
-					"bottom": "dirtnt:block/%s_tnt_bottom",
-					"side": "dirtnt:block/%s_tnt_side"
+					"top": "%s:block/%s_top",
+					"bottom": "%s:block/%s_bottom",
+					"side": "%s:block/%s_side"
 				}
 			}
-			""", dirtName, dirtName, dirtName);
+			""", namespace, path, namespace, path, namespace, path);
 	}
 }
