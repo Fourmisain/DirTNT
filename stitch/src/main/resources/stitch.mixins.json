@@ -1,0 +1,16 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "io.github.fourmisain.stitch.mixin",
+	"compatibilityLevel": "JAVA_8",
+	"mixins": [
+		"SpriteAccessor",
+		"SpriteAtlasTextureMixin",
+		"SpriteInfoAccessor"
+	],
+	"client": [
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

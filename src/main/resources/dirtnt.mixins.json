@@ -9,10 +9,7 @@
 		"FlintAndSteelDispenserBehaviorMixin",
 		"TagGroupLoaderMixin",
 		"TntBlockMixin",
-		"TntEntityMixin",
-		"autogen.SpriteAccessor",
-		"autogen.SpriteAtlasTextureMixin",
-		"autogen.SpriteInfoAccessor"
+		"TntEntityMixin"
 	],
 	"client": [
 		"TntEntityRendererMixin"

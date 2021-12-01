@@ -1,8 +1,8 @@
 package fourmisain.dirtnt.client;
 
 import fourmisain.dirtnt.DirTnt;
-import fourmisain.dirtnt.api.API;
-import fourmisain.dirtnt.api.SpriteRecipe;
+import io.github.fourmisain.stitch.api.SpriteRecipe;
+import io.github.fourmisain.stitch.api.Stitch;
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.MissingSprite;
 import net.minecraft.client.texture.NativeImage;
@@ -46,7 +46,7 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 		DirTnt.LOGGER.debug("collectSpriteInfo() {} {}x{}", info.getId(), info.getWidth(), info.getHeight());
 		w = Math.max(w, info.getWidth());
 		h = Math.max(h, info.getHeight());
-		animationData = API.getAnimationData(info);
+		animationData = Stitch.getAnimationData(info);
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 	@Override
 	public void collectSprite(Sprite sprite) {
 		DirTnt.LOGGER.debug("collectSprite() {}", sprite.getId());
-		this.texture = API.getImage(sprite);
+		this.texture = Stitch.getImage(sprite);
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 
 		//load template texture
 		NativeImage templateTexture;
-		Identifier templateId = API.getTexturePath(DirTnt.id("block/tnt_" + side + "_template"));
+		Identifier templateId = Stitch.getTextureResourcePath(DirTnt.id("block/tnt_" + side + "_template"));
 
 		try (Resource res = resourceManager.getResource(templateId)) {
 			templateTexture = NativeImage.read(res.getInputStream());

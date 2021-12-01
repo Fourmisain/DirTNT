@@ -1,7 +1,8 @@
-package fourmisain.dirtnt.client;
+package fourmisain.dirtnt;
 
-import fourmisain.dirtnt.DirTnt;
-import fourmisain.dirtnt.api.API;
+import fourmisain.dirtnt.client.DirtTntEntityRenderer;
+import fourmisain.dirtnt.client.DirtTntSpriteRecipe;
+import io.github.fourmisain.stitch.api.Stitch;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -28,9 +29,9 @@ public class DirTntClient implements ClientModInitializer {
 		for (Identifier dirtType : DIRT_TYPES) {
 			EntityRendererRegistry.register(DirTnt.ENTITY_TYPE_MAP.get(dirtType), (context) -> new DirtTntEntityRenderer(dirtType, context));
 
-			API.addRecipe(new DirtTntSpriteRecipe(dirtType, "side"));
-			API.addRecipe(new DirtTntSpriteRecipe(dirtType, "top"));
-			API.addRecipe(new DirtTntSpriteRecipe(dirtType, "bottom"));
+			Stitch.registerRecipe(new DirtTntSpriteRecipe(dirtType, "side"));
+			Stitch.registerRecipe(new DirtTntSpriteRecipe(dirtType, "top"));
+			Stitch.registerRecipe(new DirtTntSpriteRecipe(dirtType, "bottom"));
 		}
 	}
 

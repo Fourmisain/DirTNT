@@ -1,8 +1,7 @@
-package fourmisain.dirtnt.mixin.autogen;
+package io.github.fourmisain.stitch.mixin;
 
-import fourmisain.dirtnt.DirTnt;
-import fourmisain.dirtnt.api.API;
-import fourmisain.dirtnt.api.SpriteRecipe;
+import io.github.fourmisain.stitch.api.SpriteRecipe;
+import io.github.fourmisain.stitch.impl.StitchImpl;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.texture.TextureStitcher;
@@ -25,29 +24,30 @@ import java.util.stream.Stream;
 /*
  * The main texture stitching logic is found inside SpriteAtlasTexture.stitch() and looks like this:
  * 1. call loadSprites(ResourceManager resourceManager, Set<Identifier> ids) to get a Collection<Sprite.Info>,
- *    where Sprite.Infos only contain dimension/animation data
- * 2. call textureStitcher.stitch(), which lays out/reserved spots in the texture atlas
+ *    where Sprite.Infos only contain size/animation data
+ * 2. call textureStitcher.stitch(), which lays out/reserves spots in the texture atlas
  * 3. call `loadSprites(ResourceManager resourceManager, TextureStitcher textureStitcher, int maxLevel)`,
- *    which walks through the stitched via textureStitcher.getStitchedSprites() and *actually* loads
+ *    which walks through the stitched atlas via textureStitcher.getStitchedSprites() and *actually* loads
  *    the sprites via `loadSprite()`
  *
- * So to dynamically add a sprite, we simply add a Sprite.Info and generate the sprite in `loadSprite()`.
+ * So to dynamically add a sprite, we could simply add a Sprite.Info and generate the sprite in `loadSprite()`.
  *
  * However, if that sprite depends on other sprites, it gets a little more complicated.
  *
  * The plan:
- * 1. collect all Sprite.Info a recipe depends on
+ * 1. abort loading the Sprite.Info
+ * 2. collect all Sprite.Info a recipe depends on
  *  once collected:
- *  2. generate a new Sprite.Info
- *  3. add it to the list and recurse steps 1-3
- * 4. let everything stitch
- * 5. abort the loading of those sprites
- * 6. collect all Sprites a recipe depends on
+ *  3. generate a new Sprite.Info
+ *  4. add it to the list and recurse steps 2-4
+ * 5. let everything stitch
+ * 6. abort loading the sprites
+ * 7. collect all Sprites a recipe depends on
  *  once collected:
- *  7. generate a new Sprite
- *  8. add it to the list and recurse steps 6-8
+ *  8. generate a new Sprite
+ *  9. add it to the list and recurse steps 7-9
  *
- * TODO: currently steps 6-8 only do a basic pass
+ * TODO: currently steps 7-9 only do a basic pass
  */
 @Mixin(SpriteAtlasTexture.class)
 public abstract class SpriteAtlasTextureMixin {
@@ -56,43 +56,43 @@ public abstract class SpriteAtlasTextureMixin {
 
 	@Dynamic("runAsync lambda in loadSprites(Lnet/minecraft/resource/ResourceManager;Ljava/util/Set;)Ljava/util/Collection;")
 	@Inject(method = "method_18160", at = @At("HEAD"), cancellable = true, remap = false)
-	private void dirtnt$skipSpriteInfoLoading(Identifier identifier, ResourceManager resourceManager, Queue<Sprite.Info> queue, CallbackInfo ci) {
-		List<SpriteRecipe> recipes = API.recipeMap.get(getId());
+	private void stitch$skipSpriteInfoLoading(Identifier identifier, ResourceManager resourceManager, Queue<Sprite.Info> queue, CallbackInfo ci) {
+		Map<Identifier, SpriteRecipe> recipes = StitchImpl.atlasRecipes.get(getId());
 		if (recipes == null) return;
 
-		// TODO use a Set afterall?
-		for (var recipe : recipes) {
-			if (recipe.getSpriteId().equals(identifier)) {
-				DirTnt.LOGGER.debug("skip loading sprite info {}", recipe.getSpriteId());
-				ci.cancel();
-			}
+		if (recipes.containsKey(identifier)) {
+			StitchImpl.LOGGER.debug("skipping loading of sprite info {}", identifier);
+			ci.cancel();
 		}
 	}
 
 	@Inject(method = "loadSprites(Lnet/minecraft/resource/ResourceManager;Ljava/util/Set;)Ljava/util/Collection;",
 			at = @At("RETURN"))
-	private void dirtnt$constructSpriteInfo(ResourceManager resourceManager, Set<Identifier> ids, CallbackInfoReturnable<Collection<Sprite.Info>> cir) {
-		List<SpriteRecipe> recipes = API.recipeMap.get(getId());
+	private void stitch$constructSpriteInfo(ResourceManager resourceManager, Set<Identifier> ids, CallbackInfoReturnable<Collection<Sprite.Info>> cir) {
+		Map<Identifier, SpriteRecipe> recipes = StitchImpl.atlasRecipes.get(getId());
 		if (recipes == null) return;
 
 		Collection<Sprite.Info> spriteInfos = cir.getReturnValue();
 
 		// for each recipe we want to know which requirements have been met and be able to strike those off
-		Map<Identifier, Set<Identifier>> dependencyMap = new HashMap<>();
-		for (var recipe : recipes) {
-			dependencyMap.put(recipe.getSpriteId(), new HashSet<>(recipe.getDependencies()));
+		Map<Identifier, Set<Identifier>> recipeDependencies = new HashMap<>();
+		for (SpriteRecipe recipe : recipes.values()) {
+			recipeDependencies.put(recipe.getSpriteId(), new HashSet<>(recipe.getDependencies()));
 		}
 
-		Queue<Sprite.Info> infoToProcess = new ArrayDeque<>(spriteInfos); // took 211821 ns
+		Queue<Sprite.Info> infoToProcess = new ArrayDeque<>(spriteInfos);
 
 		while (!infoToProcess.isEmpty()) {
 			Sprite.Info info = infoToProcess.remove();
 
-			for (var recipe : recipes) {
+			// TODO iterate over recipeDependencies instead of recipes.values()?
+			for (SpriteRecipe recipe : recipes.values()) {
 				Identifier recipeId = recipe.getSpriteId();
-				Set<Identifier> dependencies = dependencyMap.get(recipeId);
+				Set<Identifier> dependencies = recipeDependencies.get(recipeId);
 
-				if (dependencies == null) continue; // already done
+				// already done
+				if (dependencies == null)
+					continue;
 
 				// strike off a found dependency and pass it to the recipe
 				if (dependencies.remove(info.getId())) {
@@ -101,51 +101,46 @@ public abstract class SpriteAtlasTextureMixin {
 
 				// if recipe requirements are met
 				if (dependencies.isEmpty()) {
+					// generate the new sprite info
 					Sprite.Info newInfo = recipe.generateSpriteInfo();
 
-					DirTnt.LOGGER.debug("adding sprite info {}", newInfo.getId());
+					StitchImpl.LOGGER.debug("adding generated sprite info {}", newInfo.getId());
 
-					// add new sprite info
+					// add it to the list
 					spriteInfos.add(newInfo);
 
 					// mark this recipe as done
-					dependencyMap.remove(recipeId);
+					recipeDependencies.remove(recipeId);
 
 					// process the new info too
 					infoToProcess.add(newInfo);
 				}
 			}
 		}
-
-		// took 2327307 ns
 	}
 
 	@Inject(method = "loadSprite(Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/client/texture/Sprite$Info;IIIII)Lnet/minecraft/client/texture/Sprite;",
 			at = @At("HEAD"),
 			cancellable = true)
-	public void dirtnt$skipSpriteLoading(ResourceManager container, Sprite.Info info, int atlasWidth, int atlasHeight, int maxLevel, int x, int y, CallbackInfoReturnable<Sprite> cir) {
-		List<SpriteRecipe> recipes = API.recipeMap.get(getId());
+	public void stitch$skipSpriteLoading(ResourceManager container, Sprite.Info info, int atlasWidth, int atlasHeight, int maxLevel, int x, int y, CallbackInfoReturnable<Sprite> cir) {
+		Map<Identifier, SpriteRecipe> recipes = StitchImpl.atlasRecipes.get(getId());
 		if (recipes == null) return;
 
-		// TODO use a Set afterall?
-		for (var recipe : recipes) {
-			if (recipe.getSpriteId().equals(info.getId())) {
-				DirTnt.LOGGER.debug("skip loading sprite {}", recipe.getSpriteId());
-				cir.setReturnValue(null);
-			}
+		if (recipes.containsKey(info.getId())) {
+			StitchImpl.LOGGER.debug("skipping loading of sprite {}", info.getId());
+			cir.setReturnValue(null);
 		}
 	}
 
-
 	@Inject(method = "loadSprite(Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/client/texture/Sprite$Info;IIIII)Lnet/minecraft/client/texture/Sprite;",
 			at = @At("RETURN"))
-	public void dirtnt$collectSpriteDependencies(ResourceManager container, Sprite.Info info, int atlasWidth, int atlasHeight, int maxLevel, int x, int y, CallbackInfoReturnable<Sprite> cir) {
-		List<SpriteRecipe> recipes = API.recipeMap.get(getId());
+	public void stitch$collectSpriteDependencies(ResourceManager container, Sprite.Info info, int atlasWidth, int atlasHeight, int maxLevel, int x, int y, CallbackInfoReturnable<Sprite> cir) {
+		Map<Identifier, SpriteRecipe> recipes = StitchImpl.atlasRecipes.get(getId());
 		if (recipes == null) return;
 
 		Sprite sprite = cir.getReturnValue();
 
-		for (var recipe : recipes) {
+		for (SpriteRecipe recipe : recipes.values()) {
 			if (recipe.getDependencies().contains(info.getId())) {
 				recipe.collectSprite(sprite);
 			}
@@ -161,19 +156,20 @@ public abstract class SpriteAtlasTextureMixin {
 					from = @At(value = "INVOKE", target = "Lnet/minecraft/client/texture/TextureStitcher;stitch()V")
 			),
 			locals = LocalCapture.CAPTURE_FAILHARD)
-	private void dirtnt$generateAndAddSprite(ResourceManager resourceManager, Stream<Identifier> idStream, Profiler profiler, int mipmapLevel, CallbackInfoReturnable<SpriteAtlasTexture.Data> cir, Set<Identifier> set, int i, TextureStitcher textureStitcher, /* ... */ int maxLevel, List<Sprite> sprites) {
+	private void stitch$generateAndAddSprite(ResourceManager resourceManager, Stream<Identifier> idStream, Profiler profiler, int mipmapLevel, CallbackInfoReturnable<SpriteAtlasTexture.Data> cir, Set<Identifier> set, int i, TextureStitcher textureStitcher, /* ... */ int maxLevel, List<Sprite> sprites) {
 		SpriteAtlasTexture atlas = (SpriteAtlasTexture) (Object) this;
-		DirTnt.LOGGER.debug("stitch {}", atlas.getId());
+		StitchImpl.LOGGER.debug("stitching atlas {}", atlas.getId());
 
-		List<SpriteRecipe> recipes = API.recipeMap.get(getId());
+		Map<Identifier, SpriteRecipe> recipes = StitchImpl.atlasRecipes.get(getId());
 		if (recipes == null) return;
 
-		for (var recipe : recipes) {
+		for (SpriteRecipe recipe : recipes.values()) {
 			// simulate loadSprites() for our new sprites
 			textureStitcher.getStitchedSprites((info, atlasWidth, atlasHeight, x, y) -> {
 				if (info.getId().equals(recipe.getSpriteId())) {
-					DirTnt.LOGGER.debug("getStitchedSprites() {} {} {} {} {} {} {}", recipe.getSpriteId(), atlas, maxLevel, atlasWidth, atlasHeight, x, y);
-					sprites.add(recipe.generateSprite(resourceManager, atlas, maxLevel, atlasWidth, atlasHeight, x, y));
+					StitchImpl.LOGGER.debug("adding sprite: {} {} maxLevel={} atlasWidth={} atlasHeight={} x={} y={}", atlas.getId(), recipe.getSpriteId(), maxLevel, atlasWidth, atlasHeight, x, y);
+					Sprite newSprite = recipe.generateSprite(resourceManager, atlas, maxLevel, atlasWidth, atlasHeight, x, y);
+					sprites.add(newSprite);
 				}
 			});
 		}

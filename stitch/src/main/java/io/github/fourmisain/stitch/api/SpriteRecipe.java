@@ -1,5 +1,6 @@
-package fourmisain.dirtnt.api;
+package io.github.fourmisain.stitch.api;
 
+import io.github.fourmisain.stitch.impl.Sprite0;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
@@ -8,6 +9,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.Set;
 
+/** A step by step instruction of how a sprite is crafted from other sprite dependencies */
 public interface SpriteRecipe {
 	// in the order they get executed:
 

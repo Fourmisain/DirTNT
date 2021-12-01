@@ -1,4 +1,4 @@
-package fourmisain.dirtnt.mixin.autogen;
+package io.github.fourmisain.stitch.mixin;
 
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.Sprite;

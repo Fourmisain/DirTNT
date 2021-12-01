@@ -1,0 +1,31 @@
+{
+	"schemaVersion": 1,
+	"id": "stitch",
+	"version": "${version}",
+	"name": "Stitch",
+	"description": "Sprite Texture Atlas Stitching API Library Fabric Mod",
+	"authors": [
+		"Fourmisain"
+	],
+	"contact": {
+		"homepage": "https://www.curseforge.com/minecraft/mc-mods/stitch",
+		"sources": "https://github.com/Fourmisain/Stitch",
+		"issues": "https://github.com/Fourmisain/Stitch/issues"
+	},
+	"license": "MIT",
+	"icon": "assets/stitch/icon.png",
+	"environment": "*",
+	"mixins": [
+		"stitch.mixins.json"
+	],
+	"depends": {
+		"fabricloader": "*",
+		"fabric": "*",
+		"minecraft": ">=1.16.0"
+	},
+	"custom": {
+		"modmenu": {
+			"badges": [ "library" ]
+		}
+	}
+}
