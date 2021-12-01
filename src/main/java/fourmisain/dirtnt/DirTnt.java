@@ -63,7 +63,7 @@ public class DirTnt implements ModInitializer {
 			return stack;
 		});
 
-		FireBlockAccessor fireBlock = (FireBlockAccessor)Blocks.FIRE;
+		FireBlockAccessor fireBlock = (FireBlockAccessor) Blocks.FIRE;
 		fireBlock.invokeRegisterFlammableBlock(DIRT_TNT_BLOCK, 15, 100);
 	}
 }
