@@ -17,7 +17,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"client": [
-			"fourmisain.dirtnt.client.DirTNTClient"
+			"fourmisain.dirtnt.DirTntClient"
 		],
 		"main": [
 			"fourmisain.dirtnt.DirTnt"
