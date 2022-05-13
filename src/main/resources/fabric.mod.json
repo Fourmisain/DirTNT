@@ -26,6 +26,7 @@
 	"mixins": [
 		"dirtnt.mixins.json"
 	],
+	"accessWidener" : "dirtnt.accesswidener",
 	"depends": {
 		"fabricloader": "*",
 		"fabric": "*",

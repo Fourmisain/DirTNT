@@ -70,6 +70,7 @@ public class DirTnt implements ModInitializer {
 		for (Identifier dirtType : DIRT_TYPES) {
 			Identifier id = getDirtTntBlockId(dirtType);
 
+			// register dirt tnt
 			DirtTntBlock block = Registry.register(Registry.BLOCK, id, new DirtTntBlock(dirtType));
 			BlockItem item = Registry.register(Registry.ITEM, id, new BlockItem(block, new FabricItemSettings().group(ItemGroup.REDSTONE)));
 			EntityType<DirtTntEntity> entityType = Registry.register(Registry.ENTITY_TYPE, id, createDirtTntEntityType(dirtType));

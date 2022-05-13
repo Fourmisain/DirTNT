@@ -19,7 +19,6 @@ public class DirTntClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		ModelLoadingRegistry.INSTANCE.registerVariantProvider((manager) -> (modelId, context) -> {
 			if (modelId.getNamespace().equals(DirTnt.MOD_ID)) {
-				DirTnt.LOGGER.debug("register model variant {}", modelId);
 				return JsonUnbakedModel.deserialize(getCubeBottomTopBlockModelJson(modelId));
 			}
 

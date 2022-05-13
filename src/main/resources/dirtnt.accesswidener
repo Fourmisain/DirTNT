@@ -1,0 +1,2 @@
+accessWidener v1 named
+accessible method net/minecraft/data/server/RecipeProvider conditionsFromItem (Lnet/minecraft/item/ItemConvertible;)Lnet/minecraft/advancement/criterion/InventoryChangedCriterion$Conditions;
