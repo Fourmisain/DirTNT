@@ -1,8 +1,13 @@
 package fourmisain.dirtnt;
 
+import com.google.gson.JsonObject;
 import fourmisain.dirtnt.block.DirtTntBlock;
 import fourmisain.dirtnt.entity.DirtTntEntity;
 import fourmisain.dirtnt.mixin.FireBlockAccessor;
+import net.devtech.arrp.ARRP;
+import net.devtech.arrp.api.RRPCallback;
+import net.devtech.arrp.api.RuntimeResourcePack;
+import net.devtech.arrp.json.loot.JPool;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -31,12 +36,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import static net.devtech.arrp.json.loot.JLootTable.*;
 
 public class DirTnt implements ModInitializer {
 	public static final String MOD_ID = "dirtnt";
 	public static Logger LOGGER = LogManager.getLogger(MOD_ID);
 
-	// TODO autogen loot tables
+	public static final RuntimeResourcePack RESOURCE_PACK = RuntimeResourcePack.create(DirTnt.id(MOD_ID));
 
 	public static final List<Identifier> DIRT_TYPES = new ArrayList<>(Registry.BLOCK.getIds());
 	// // Blocks.DIRT, Blocks.STONE, Blocks.COBBLESTONE
@@ -66,6 +72,8 @@ public class DirTnt implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		FireBlockAccessor fireBlock = (FireBlockAccessor)Blocks.FIRE;
+		JsonObject notUnstable = new JsonObject();
+		notUnstable.addProperty("unstable", "false");
 
 		for (Identifier dirtType : DIRT_TYPES) {
 			Identifier id = getDirtTntBlockId(dirtType);
@@ -82,7 +90,25 @@ public class DirTnt implements ModInitializer {
 			DispenserBlock.registerBehavior(item, (pointer, stack) -> dispenseDirtTnt(dirtType, pointer, stack));
 
 			fireBlock.invokeRegisterFlammableBlock(block, 15, 100);
+
+			RESOURCE_PACK.addRecipe()
+
+			RESOURCE_PACK.addLootTable(DirTnt.id("blocks/" + id.getPath()),
+					loot("minecraft:block")
+							.pool(pool()
+									.rolls(1)
+									.bonus(0)
+									.entry(entry()
+											.type("minecraft:item")
+											.name(id.toString())
+											.condition(predicate("minecraft:block_state_property")
+													.parameter("block", id.toString())
+													.parameter("properties", notUnstable))
+									)
+									.condition(predicate("minecraft:survives_explosion"))));
 		}
+
+		RRPCallback.BEFORE_VANILLA.register(listener -> listener.add(RESOURCE_PACK));
 	}
 
 	private static ItemStack dispenseDirtTnt(Identifier dirtType, BlockPointer pointer, ItemStack stack) {

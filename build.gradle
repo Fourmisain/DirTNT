@@ -9,6 +9,12 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
+repositories {
+	maven {
+		url = uri("https://storage.googleapis.com/devan-maven/")
+	}
+}
+
 loom {
 	accessWidenerPath = file("src/main/resources/dirtnt.accesswidener")
 }
@@ -19,6 +25,7 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	include implementation(project(path: ":stitch", configuration: 'namedElements'))
+	include modImplementation("net.devtech:arrp:${project.arrp_version}")
 }
 
 processResources {
