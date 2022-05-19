@@ -13,4 +13,6 @@ public class DirTntConfig {
 			new Identifier("minecraft", "gravel")
     );
 
+	public boolean enableAll = false;
+
 }

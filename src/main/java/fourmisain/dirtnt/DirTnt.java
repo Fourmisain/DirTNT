@@ -92,6 +92,7 @@ public class DirTnt implements ModInitializer {
 		// apply config
 		DIRT_TYPES.clear();
 		DIRT_TYPES.addAll(config.dirtTypes);
+		if (config.enableAll) DIRT_TYPES.addAll(Registry.BLOCK.getIds()); // experimental option
 	}
 
 	@Override
