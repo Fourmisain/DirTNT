@@ -4,23 +4,17 @@ import com.google.gson.JsonObject;
 import fourmisain.dirtnt.block.DirtTntBlock;
 import fourmisain.dirtnt.entity.DirtTntEntity;
 import fourmisain.dirtnt.mixin.FireBlockAccessor;
-import net.devtech.arrp.ARRP;
 import net.devtech.arrp.api.RRPCallback;
 import net.devtech.arrp.api.RuntimeResourcePack;
-import net.devtech.arrp.json.loot.JPool;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
@@ -32,11 +26,14 @@ import net.minecraft.world.event.GameEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import static net.devtech.arrp.json.loot.JLootTable.*;
+import static net.devtech.arrp.json.recipe.JIngredient.ingredient;
+import static net.devtech.arrp.json.recipe.JKeys.keys;
+import static net.devtech.arrp.json.recipe.JPattern.pattern;
+import static net.devtech.arrp.json.recipe.JRecipe.shaped;
+import static net.devtech.arrp.json.recipe.JResult.item;
 
 public class DirTnt implements ModInitializer {
 	public static final String MOD_ID = "dirtnt";
@@ -50,7 +47,7 @@ public class DirTnt implements ModInitializer {
 	// used to override TntBlock.primeTnt() behavior
 	public static Identifier dirtyOverride = null;
 
-	public static Map<Identifier, Block> BLOCK_MAP = new HashMap<>();
+	public static Map<Identifier, DirtTntBlock> BLOCK_MAP = new HashMap<>();
 	public static Map<Identifier, Item> ITEM_MAP = new HashMap<>();
 	public static Map<Identifier, EntityType<DirtTntEntity>> ENTITY_TYPE_MAP = new HashMap<>();
 
@@ -91,8 +88,25 @@ public class DirTnt implements ModInitializer {
 
 			fireBlock.invokeRegisterFlammableBlock(block, 15, 100);
 
-			RESOURCE_PACK.addRecipe()
+			// auto-gen recipe
+			Optional<Item> dirt = Registry.ITEM.getOrEmpty(dirtType);
+			if (dirt.isEmpty() || dirt.get() == Items.AIR) { // not every block has an associated item (and air is not a valid crafting ingredient)
+				DirTnt.LOGGER.warn("can't auto-gen recipe for dirt type {}", dirtType);
+			} else {
+				RESOURCE_PACK.addRecipe(id, shaped(
+						pattern(
+								"###",
+								"#X#",
+								"###"
+						),
+						keys()
+								.key("#", ingredient().item(dirt.get()))
+								.key("X", ingredient().item(Items.TNT)),
+						item(item)
+				));
+			}
 
+			// auto-gen block loot table
 			RESOURCE_PACK.addLootTable(DirTnt.id("blocks/" + id.getPath()),
 					loot("minecraft:block")
 							.pool(pool()

@@ -20,6 +20,8 @@ import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
+import java.util.Optional;
+
 public class DirtTntEntity extends TntEntity {
 	public static final int RADIUS = 3;
 
@@ -52,7 +54,10 @@ public class DirtTntEntity extends TntEntity {
 
 		BlockPos.Mutable targetBlockPos = new BlockPos.Mutable();
 
-		Block dirtBlock = Registry.BLOCK.get(dirtType); // TODO do a check?
+		Optional<Block> maybeDirtBlock = Registry.BLOCK.getOrEmpty(dirtType);
+		if (maybeDirtBlock.isEmpty()) throw new AssertionError("Dirt TNT entity exists but block is not registered!");
+
+		Block dirtBlock = maybeDirtBlock.get();
 
 		// for every 'target' block within a distance of RADIUS
 		for (int x = -RADIUS; x <= RADIUS; x++) {

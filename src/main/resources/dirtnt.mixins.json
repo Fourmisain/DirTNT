@@ -7,7 +7,6 @@
 		"FireBlockAccessor",
 		"FireBlockMixin",
 		"FlintAndSteelDispenserBehaviorMixin",
-		"RecipeManagerMixin",
 		"TagGroupLoaderMixin",
 		"TntBlockMixin",
 		"TntEntityMixin"
