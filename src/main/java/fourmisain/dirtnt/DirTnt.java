@@ -2,6 +2,8 @@ package fourmisain.dirtnt;
 
 import com.google.gson.JsonObject;
 import fourmisain.dirtnt.block.DirtTntBlock;
+import fourmisain.dirtnt.config.DirTntConfig;
+import fourmisain.dirtnt.config.GsonConfigHelper;
 import fourmisain.dirtnt.entity.DirtTntEntity;
 import fourmisain.dirtnt.mixin.FireBlockAccessor;
 import net.devtech.arrp.api.RRPCallback;
@@ -26,6 +28,7 @@ import net.minecraft.world.event.GameEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.util.*;
 
 import static net.devtech.arrp.json.loot.JLootTable.*;
@@ -41,8 +44,7 @@ public class DirTnt implements ModInitializer {
 
 	public static final RuntimeResourcePack RESOURCE_PACK = RuntimeResourcePack.create(DirTnt.id(MOD_ID));
 
-	public static final List<Identifier> DIRT_TYPES = new ArrayList<>(Registry.BLOCK.getIds());
-	// // Blocks.DIRT, Blocks.STONE, Blocks.COBBLESTONE
+	public static final Set<Identifier> DIRT_TYPES = new HashSet<>();
 
 	// used to override TntBlock.primeTnt() behavior
 	public static Identifier dirtyOverride = null;
@@ -62,12 +64,40 @@ public class DirTnt implements ModInitializer {
 		if (namespace.equals("minecraft")) {
 			return DirTnt.id(String.format("%s_tnt", dirtType.getPath()));
 		} else {
+			// to prevent most name collisions
 			return DirTnt.id(String.format("%s_%s_tnt", namespace, dirtType.getPath()));
 		}
 	}
 
+	public static void loadConfig() {
+		DirTntConfig config = new DirTntConfig(); // load defaults
+
+		GsonConfigHelper configHelper = new GsonConfigHelper(MOD_ID);
+		if (configHelper.exists()) {
+			// load config
+			try {
+				config = configHelper.load(DirTntConfig.class);
+			} catch (IOException e) {
+				LOGGER.error("couldn't load config", e);
+			}
+		} else {
+			// save defaults
+			try {
+				configHelper.save(config);
+			} catch (IOException e) {
+				LOGGER.error("couldn't save config", e);
+			}
+		}
+
+		// apply config
+		DIRT_TYPES.clear();
+		DIRT_TYPES.addAll(config.dirtTypes);
+	}
+
 	@Override
 	public void onInitialize() {
+		loadConfig();
+
 		FireBlockAccessor fireBlock = (FireBlockAccessor)Blocks.FIRE;
 		JsonObject notUnstable = new JsonObject();
 		notUnstable.addProperty("unstable", "false");
