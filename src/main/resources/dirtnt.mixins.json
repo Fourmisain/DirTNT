@@ -12,7 +12,8 @@
 		"TntEntityMixin"
 	],
 	"client": [
-		"TntEntityRendererMixin"
+		"TntEntityRendererMixin",
+		"TranslationStorageMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
