@@ -5,6 +5,7 @@ import fourmisain.dirtnt.Dirtable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.entity.TntEntityRenderer;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,9 +33,9 @@ public abstract class TntEntityRendererMixin implements Dirtable {
 	@ModifyArg(method = "render(Lnet/minecraft/entity/TntEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
 			at = @At(
 					value = "INVOKE",
-					target = "Lnet/minecraft/client/render/entity/TntMinecartEntityRenderer;renderFlashingBlock(Lnet/minecraft/block/BlockState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IZ)V"
+					target = "Lnet/minecraft/client/render/entity/TntMinecartEntityRenderer;renderFlashingBlock(Lnet/minecraft/client/render/block/BlockRenderManager;Lnet/minecraft/block/BlockState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IZ)V"
 			),
-			index = 0)
+			index = 1)
 	private BlockState replaceTntTexture(BlockState blockState) {
 		return isDirty() ? DirTnt.BLOCK_MAP.get(dirtType).getDefaultState() : blockState;
 	}

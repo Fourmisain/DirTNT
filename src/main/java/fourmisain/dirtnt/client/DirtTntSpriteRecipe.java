@@ -13,6 +13,8 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Optional;
 import java.util.Set;
 
 public class DirtTntSpriteRecipe implements SpriteRecipe {
@@ -76,8 +78,14 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 		NativeImage templateTexture;
 		Identifier templateId = Stitch.getTextureResourcePath(DirTnt.id("block/tnt_" + side + "_template"));
 
-		try (Resource res = resourceManager.getResource(templateId)) {
-			templateTexture = NativeImage.read(res.getInputStream());
+		Optional<Resource> maybeResource = resourceManager.getResource(templateId);
+		if (maybeResource.isEmpty()) {
+			DirTnt.LOGGER.error("texture template doesn't exist: {}", templateId);
+			return MissingSprite.getMissingSpriteTexture().getImage();
+		}
+
+		try (InputStream input = maybeResource.get().getInputStream()) {
+			templateTexture = NativeImage.read(input);
 		} catch (IOException e) {
 			DirTnt.LOGGER.error("couldn't load texture template {}", templateId, e);
 			return MissingSprite.getMissingSpriteTexture().getImage();
