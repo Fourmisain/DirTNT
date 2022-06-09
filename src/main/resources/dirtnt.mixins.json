@@ -7,7 +7,6 @@
 		"FireBlockAccessor",
 		"FireBlockMixin",
 		"FlintAndSteelDispenserBehaviorMixin",
-		"TagGroupLoaderMixin",
 		"TntBlockMixin",
 		"TntEntityMixin"
 	],

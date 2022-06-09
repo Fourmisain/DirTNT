@@ -31,7 +31,7 @@ public class DirtTntEntity extends TntEntity {
 	}
 
 	public DirtTntEntity(Identifier dirtType, World world, double x, double y, double z) {
-		this(dirtType, DirTnt.ENTITY_TYPE_MAP.get(DirTnt.dirtyOverride), world); // TODO does this work
+		this(dirtType, DirTnt.ENTITY_TYPE_MAP.get(dirtType), world);
 		this.setPosition(x, y, z);
 		double angle = world.random.nextDouble() * 2*Math.PI;
 		this.setVelocity(-Math.sin(angle) * 0.02, 0.2, -Math.cos(angle) * 0.02);

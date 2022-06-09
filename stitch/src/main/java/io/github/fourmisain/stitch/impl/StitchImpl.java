@@ -12,5 +12,5 @@ public class StitchImpl {
 	public static final Logger LOGGER = LogManager.getLogger("stitch");
 
 	/** atlas id -> sprite id -> recipe */
-	public static Map<Identifier, Map<Identifier, SpriteRecipe>> atlasRecipes = new LinkedHashMap<>();
+	public static final Map<Identifier, Map<Identifier, SpriteRecipe>> atlasRecipes = new LinkedHashMap<>();
 }

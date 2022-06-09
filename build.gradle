@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.11-SNAPSHOT'
+	id 'fabric-loom' version '0.12-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -25,7 +25,7 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	include implementation(project(path: ":stitch", configuration: 'namedElements'))
-	include modImplementation("net.devtech:arrp:${project.arrp_version}")
+	modImplementation("net.devtech:arrp:${project.arrp_version}")
 }
 
 processResources {

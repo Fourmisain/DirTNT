@@ -19,6 +19,7 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.*;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
@@ -37,10 +38,11 @@ import static net.devtech.arrp.json.recipe.JKeys.keys;
 import static net.devtech.arrp.json.recipe.JPattern.pattern;
 import static net.devtech.arrp.json.recipe.JRecipe.shaped;
 import static net.devtech.arrp.json.recipe.JResult.item;
+import static net.devtech.arrp.json.tags.JTag.tag;
 
 public class DirTnt implements ModInitializer {
 	public static final String MOD_ID = "dirtnt";
-	public static Logger LOGGER = LogManager.getLogger(MOD_ID);
+	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
 	public static final RuntimeResourcePack RESOURCE_PACK = RuntimeResourcePack.create(DirTnt.id(MOD_ID));
 
@@ -49,9 +51,9 @@ public class DirTnt implements ModInitializer {
 	// used to override TntBlock.primeTnt() behavior
 	public static Identifier dirtyOverride = null;
 
-	public static Map<Identifier, DirtTntBlock> BLOCK_MAP = new HashMap<>();
-	public static Map<Identifier, Item> ITEM_MAP = new HashMap<>();
-	public static Map<Identifier, EntityType<DirtTntEntity>> ENTITY_TYPE_MAP = new HashMap<>();
+	public static final Map<Identifier, DirtTntBlock> BLOCK_MAP = new HashMap<>();
+	public static final Map<Identifier, Item> ITEM_MAP = new HashMap<>();
+	public static final Map<Identifier, EntityType<DirtTntEntity>> ENTITY_TYPE_MAP = new HashMap<>();
 
 	public static Identifier id(String id) {
 		return new Identifier(MOD_ID, id);
@@ -151,6 +153,10 @@ public class DirTnt implements ModInitializer {
 													.parameter("properties", notUnstable))
 									)
 									.condition(predicate("minecraft:survives_explosion"))));
+
+			// add blocks to "enderman_holdable" tag
+			RESOURCE_PACK.addTag(new Identifier("blocks/" + BlockTags.ENDERMAN_HOLDABLE.id().getPath()),
+					tag().add(id));
 		}
 
 		RRPCallback.BEFORE_VANILLA.register(listener -> listener.add(RESOURCE_PACK));
