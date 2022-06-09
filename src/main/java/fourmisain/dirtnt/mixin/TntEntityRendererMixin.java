@@ -5,7 +5,6 @@ import fourmisain.dirtnt.Dirtable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.entity.TntEntityRenderer;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
