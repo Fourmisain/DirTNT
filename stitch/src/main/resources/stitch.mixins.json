@@ -5,11 +5,9 @@
 	"compatibilityLevel": "JAVA_17",
 	"client": [
 		"AtlasLoaderAtlasSourceSpriteRegionsMixin",
-		"AtlasLoaderMixin",
 		"SpriteContentsAccessor",
 		"SpriteContentsMixin",
-		"SpriteLoaderMixin1",
-		"SpriteLoaderMixin2"
+		"SpriteLoaderMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
