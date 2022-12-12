@@ -19,9 +19,8 @@
 		"stitch.mixins.json"
 	],
 	"depends": {
-		"fabricloader": "*",
-		"fabric": "*",
-		"minecraft": ">=1.16.0"
+		"fabricloader": ">=0.14.10",
+		"minecraft": ">=1.19.3"
 	},
 	"custom": {
 		"modmenu": {

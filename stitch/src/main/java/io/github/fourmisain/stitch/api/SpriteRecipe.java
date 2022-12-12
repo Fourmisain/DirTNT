@@ -1,33 +1,46 @@
 package io.github.fourmisain.stitch.api;
 
-import io.github.fourmisain.stitch.impl.Sprite0;
+import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.texture.SpriteContents;
+import net.minecraft.client.texture.SpriteDimensions;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
 import java.util.Set;
 
-/** A step by step instruction of how a sprite is crafted from other sprite dependencies */
+/** An instruction of how a sprite is crafted from other sprite dependencies */
 public interface SpriteRecipe {
-	// in the order they get executed:
+	/**
+	 * The atlas loader id this recipe is made for. One of
+	 *   minecraft:banner_patterns
+	 *   minecraft:beds
+	 *   minecraft:chests
+	 *   minecraft:shield_patterns
+	 *   minecraft:signs
+	 *   minecraft:shulker_boxes
+	 *   minecraft:blocks
+	 * (see BakedModelManager.LAYERS_TO_LOADERS) or of
+	 *   minecraft:mob_effects
+	 *   minecraft:paintings
+	 *   minecraft:particles
+	 */
+	default Identifier getAtlasId() {
+		return new Identifier("blocks"); // corresponds to BLOCK_ATLAS_TEXTURE
+	}
 
-	Identifier getAtlasId();
-
+	/** Which sprites this recipe depends on. */
 	Set<Identifier> getDependencies();
 
-	void collectSpriteInfo(Sprite.Info info);
-
+	/** The id of the sprite this recipe generates or overwrites */
 	Identifier getSpriteId();
 
-	Sprite.Info generateSpriteInfo();
+	/** Called for each sprite dependency, if it exists. */
+	void collectSprite(SpriteContents spriteContents);
 
-	void collectSprite(Sprite sprite);
+	SpriteDimensions generateSize();
+
+	AnimationResourceMetadata generateAnimationData() ;
 
 	NativeImage generateImage(ResourceManager resourceManager);
-
-	default Sprite generateSprite(ResourceManager resourceManager, SpriteAtlasTexture atlasTexture, int maxLevel, int atlasWidth, int atlasHeight, int x, int y) {
-		return new Sprite0(atlasTexture, generateSpriteInfo(), maxLevel, atlasWidth, atlasHeight, x, y, generateImage(resourceManager));
-	}
 }

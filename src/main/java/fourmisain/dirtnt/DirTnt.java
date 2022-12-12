@@ -10,6 +10,7 @@ import net.devtech.arrp.api.RRPCallback;
 import net.devtech.arrp.api.RuntimeResourcePack;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.DispenserBlock;
@@ -17,13 +18,14 @@ import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.*;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.apache.logging.log4j.LogManager;
@@ -46,7 +48,7 @@ public class DirTnt implements ModInitializer {
 
 	public static final RuntimeResourcePack RESOURCE_PACK = RuntimeResourcePack.create(DirTnt.id(MOD_ID));
 
-	public static final Set<Identifier> DIRT_TYPES = new HashSet<>();
+	public static final Set<Identifier> DIRT_TYPES = new LinkedHashSet<>();
 
 	// used to override TntBlock.primeTnt() behavior
 	public static Identifier dirtyOverride = null;
@@ -94,7 +96,7 @@ public class DirTnt implements ModInitializer {
 		// apply config
 		DIRT_TYPES.clear();
 		DIRT_TYPES.addAll(config.dirtTypes);
-		if (config.enableAll) DIRT_TYPES.addAll(Registry.BLOCK.getIds()); // experimental option
+		if (config.enableAll) DIRT_TYPES.addAll(Registries.BLOCK.getIds()); // experimental option
 	}
 
 	@Override
@@ -109,10 +111,9 @@ public class DirTnt implements ModInitializer {
 			Identifier id = getDirtTntBlockId(dirtType);
 
 			// register dirt tnt
-			DirtTntBlock block = Registry.register(Registry.BLOCK, id, new DirtTntBlock(dirtType));
-			BlockItem item = Registry.register(Registry.ITEM, id, new BlockItem(block, new FabricItemSettings().group(ItemGroup.REDSTONE)));
-			EntityType<DirtTntEntity> entityType = Registry.register(Registry.ENTITY_TYPE, id, createDirtTntEntityType(dirtType));
-
+			DirtTntBlock block = Registry.register(Registries.BLOCK, id, new DirtTntBlock(dirtType));
+			BlockItem item = Registry.register(Registries.ITEM, id, new BlockItem(block, new FabricItemSettings()));
+			EntityType<DirtTntEntity> entityType = Registry.register(Registries.ENTITY_TYPE, id, createDirtTntEntityType(dirtType));
 			BLOCK_MAP.put(dirtType, block);
 			ITEM_MAP.put(dirtType, item);
 			ENTITY_TYPE_MAP.put(dirtType, entityType);
@@ -122,7 +123,7 @@ public class DirTnt implements ModInitializer {
 			fireBlock.invokeRegisterFlammableBlock(block, 15, 100);
 
 			// auto-gen recipe
-			Optional<Item> dirt = Registry.ITEM.getOrEmpty(dirtType);
+			Optional<Item> dirt = Registries.ITEM.getOrEmpty(dirtType);
 			if (dirt.isEmpty() || dirt.get() == Items.AIR) { // not every block has an associated item (and air is not a valid crafting ingredient)
 				DirTnt.LOGGER.warn("can't auto-gen recipe for dirt type {}", dirtType);
 			} else {
@@ -158,6 +159,12 @@ public class DirTnt implements ModInitializer {
 			RESOURCE_PACK.addTag(new Identifier("blocks/" + BlockTags.ENDERMAN_HOLDABLE.id().getPath()),
 					tag().add(id));
 		}
+
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register(entries -> {
+			for (Identifier dirtType : DIRT_TYPES) {
+				entries.add(ITEM_MAP.get(dirtType));
+			}
+		});
 
 		RRPCallback.BEFORE_VANILLA.register(listener -> listener.add(RESOURCE_PACK));
 	}

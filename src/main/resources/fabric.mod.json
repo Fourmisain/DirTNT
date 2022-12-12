@@ -26,10 +26,9 @@
 	"mixins": [
 		"dirtnt.mixins.json"
 	],
-	"accessWidener" : "dirtnt.accesswidener",
 	"depends": {
-		"fabricloader": "*",
+		"fabricloader": ">=0.14.10",
 		"fabric": "*",
-		"minecraft": ">=1.17.0"
+		"minecraft": ">=1.19.3"
 	}
 }

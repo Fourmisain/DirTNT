@@ -1,13 +1,11 @@
 package fourmisain.dirtnt.client;
 
 import fourmisain.dirtnt.DirTnt;
+import fourmisain.dirtnt.mixin.MissingSpriteAccessor;
 import io.github.fourmisain.stitch.api.SpriteRecipe;
 import io.github.fourmisain.stitch.api.Stitch;
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
-import net.minecraft.client.texture.MissingSprite;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.texture.*;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -18,9 +16,10 @@ import java.util.Optional;
 import java.util.Set;
 
 public class DirtTntSpriteRecipe implements SpriteRecipe {
-	private int w, h;
-	private AnimationResourceMetadata animationData;
-	private NativeImage texture;
+	// collected data
+	private int w = 16, h = 16;
+	private NativeImage image;
+	private AnimationResourceMetadata animationData = AnimationResourceMetadata.EMPTY;
 
 	private final String side;
 	private final Identifier id;
@@ -28,27 +27,12 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 
 	public DirtTntSpriteRecipe(Identifier dirtType, String side) {
 		this.side = side;
-		this.dirtTexture = new Identifier(dirtType.getNamespace(), "block/" + dirtType.getPath());
 		Identifier blockId = DirTnt.getDirtTntBlockId(dirtType);
 		this.id = new Identifier(blockId.getNamespace(), "block/" + blockId.getPath() + "_" + side);
-	}
 
-	@Override
-	public Identifier getAtlasId() {
-		return SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE;
-	}
-
-	@Override
-	public Set<Identifier> getDependencies() {
-		return Set.of(dirtTexture);
-	}
-
-	@Override
-	public void collectSpriteInfo(Sprite.Info info) {
-		DirTnt.LOGGER.debug("collectSpriteInfo() {} {}x{}", info.getId(), info.getWidth(), info.getHeight());
-		w = Math.max(w, info.getWidth());
-		h = Math.max(h, info.getHeight());
-		animationData = Stitch.getAnimationData(info);
+		// note: this doesn't always correspond to the block's sprite, e.g. the dark_oak_button block uses the dark_oak_planks sprite
+		// collectSpriteData() will therefore not be called for it
+		this.dirtTexture = new Identifier(dirtType.getNamespace(), "block/" + dirtType.getPath());
 	}
 
 	@Override
@@ -57,23 +41,30 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 	}
 
 	@Override
-	public Sprite.Info generateSpriteInfo() {
-		DirTnt.LOGGER.debug("generateSpriteInfo() {} {}x{}", getSpriteId(), w, h);
-		return new Sprite.Info(getSpriteId(), w, h, animationData);
+	public Set<Identifier> getDependencies() {
+		return Set.of(dirtTexture);
 	}
 
 	@Override
-	public void collectSprite(Sprite sprite) {
-		DirTnt.LOGGER.debug("collectSprite() {}", sprite.getId());
-		this.texture = Stitch.getImage(sprite);
+	public void collectSprite(SpriteContents sprite) {
+		this.w = sprite.getWidth();
+		this.h = sprite.getHeight();
+		this.image = Stitch.getImage(sprite);
+		this.animationData = Stitch.getAnimationData(sprite);
+	}
+
+	@Override
+	public SpriteDimensions generateSize() {
+		return new SpriteDimensions(w, h);
+	}
+
+	@Override
+	public AnimationResourceMetadata generateAnimationData() {
+		return animationData;
 	}
 
 	@Override
 	public NativeImage generateImage(ResourceManager resourceManager) {
-		DirTnt.LOGGER.debug("generateImage() {}x{}", texture.getWidth(), texture.getHeight());
-		NativeImage image = new NativeImage(texture.getWidth(), texture.getHeight(), false);
-		image.copyFrom(texture);
-
 		//load template texture
 		NativeImage templateTexture;
 		Identifier templateId = Stitch.getTextureResourcePath(DirTnt.id("block/tnt_" + side + "_template"));
@@ -81,34 +72,38 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 		Optional<Resource> maybeResource = resourceManager.getResource(templateId);
 		if (maybeResource.isEmpty()) {
 			DirTnt.LOGGER.error("texture template doesn't exist: {}", templateId);
-			return MissingSprite.getMissingSpriteTexture().getImage();
+			return null;
 		}
 
 		try (InputStream input = maybeResource.get().getInputStream()) {
 			templateTexture = NativeImage.read(input);
 		} catch (IOException e) {
 			DirTnt.LOGGER.error("couldn't load texture template {}", templateId, e);
-			return MissingSprite.getMissingSpriteTexture().getImage();
+			return null;
 		}
 
-		// frame dimensions
-		int fw = animationData.getWidth(w);
-		int fh = animationData.getHeight(h);
+		// use missing texture if block id didn't correspond to texture id
+		if (this.image == null) {
+			this.image = MissingSpriteAccessor.invokeCreateImage(w, h);
+		}
+
+		NativeImage image = new NativeImage(this.image.getWidth(), this.image.getHeight(), false);
+		image.copyFrom(this.image);
 
 		// scaling factors
-		int xScale = fw / 16;
-		int yScale = fh / 16;
+		int xScale = w / 16;
+		int yScale = h / 16;
 
-		int xFrames = image.getWidth() / animationData.getWidth(w);
-		int yFrames = image.getHeight() / animationData.getHeight(h);
+		int xFrames = image.getWidth() / w;
+		int yFrames = image.getHeight() / h;
 
 		// for each frame
 		for (int j = 0; j < yFrames; j++) {
 			for (int i = 0; i < xFrames; i++) {
 				// blend textures together
-				for (int y = 0; y < fh; y++) {
-					for (int x = 0; x < fw; x++) {
-						image.blend(i * fw + x, j * fh + y, templateTexture.getColor(x / xScale, y / yScale));
+				for (int y = 0; y < h; y++) {
+					for (int x = 0; x < w; x++) {
+						image.blend(i * w + x, j * h + y, templateTexture.getColor(x / xScale, y / yScale));
 					}
 				}
 

@@ -1,11 +1,11 @@
 package io.github.fourmisain.stitch.api;
 
+import io.github.fourmisain.stitch.impl.AnimationDataAccess;
 import io.github.fourmisain.stitch.impl.StitchImpl;
-import io.github.fourmisain.stitch.mixin.SpriteAccessor;
-import io.github.fourmisain.stitch.mixin.SpriteInfoAccessor;
+import io.github.fourmisain.stitch.mixin.SpriteContentsAccessor;
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,12 +28,12 @@ public class Stitch {
 		});
 	}
 
-	public static NativeImage getImage(@NotNull Sprite sprite) {
-		return ((SpriteAccessor) sprite).getImages()[0];
+	public static NativeImage getImage(@NotNull SpriteContents sprite) {
+		return ((SpriteContentsAccessor) sprite).getImage();
 	}
 
-	public static AnimationResourceMetadata getAnimationData(Sprite.Info spriteInfo) {
-		return ((SpriteInfoAccessor) (Object) spriteInfo).getAnimationData();
+	public static AnimationResourceMetadata getAnimationData(@NotNull SpriteContents sprite) {
+		return ((AnimationDataAccess) sprite).getAnimationData();
 	}
 
 	public static Identifier getTextureResourcePath(Identifier id) {

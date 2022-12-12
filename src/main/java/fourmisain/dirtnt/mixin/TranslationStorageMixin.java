@@ -9,9 +9,9 @@ import net.minecraft.block.Block;
 import net.minecraft.client.resource.language.LanguageDefinition;
 import net.minecraft.client.resource.language.TranslationStorage;
 import net.minecraft.entity.EntityType;
+import net.minecraft.registry.Registries;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -34,7 +34,7 @@ public abstract class TranslationStorageMixin {
 	)
 	private static void dirtnt$addDependentTranslations(ResourceManager resourceManager, List<LanguageDefinition> definitions, CallbackInfoReturnable<TranslationStorage> cir, Map<String, String> translations) {
 		for (Identifier dirtType : DIRT_TYPES) {
-			Optional<Block> block = Registry.BLOCK.getOrEmpty(dirtType);
+			Optional<Block> block = Registries.BLOCK.getOrEmpty(dirtType);
 			if (block.isEmpty()) continue;
 
 			DirtTntBlock tntBlock = DirTnt.BLOCK_MAP.get(dirtType);

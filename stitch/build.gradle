@@ -3,7 +3,7 @@ plugins {
 	id 'maven-publish'
 }
 
-targetCompatibility = sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = sourceCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.mod_name
 version = project.mod_version
@@ -16,6 +16,10 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/stitch.accesswidener")
+}
+
 processResources {
 	inputs.property "version", project.version
 
@@ -25,7 +29,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 8
+	it.options.release = 17
 }
 
 java {

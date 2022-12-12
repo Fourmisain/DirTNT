@@ -7,13 +7,13 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.TntEntity;
+import net.minecraft.registry.Registries;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.RaycastContext;
@@ -54,7 +54,7 @@ public class DirtTntEntity extends TntEntity {
 
 		BlockPos.Mutable targetBlockPos = new BlockPos.Mutable();
 
-		Optional<Block> maybeDirtBlock = Registry.BLOCK.getOrEmpty(dirtType);
+		Optional<Block> maybeDirtBlock = Registries.BLOCK.getOrEmpty(dirtType);
 		if (maybeDirtBlock.isEmpty()) throw new AssertionError("Dirt TNT entity exists but block is not registered!");
 
 		Block dirtBlock = maybeDirtBlock.get();

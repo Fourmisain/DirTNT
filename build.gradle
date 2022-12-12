@@ -13,10 +13,7 @@ repositories {
 	maven {
 		url = uri("https://storage.googleapis.com/devan-maven/")
 	}
-}
-
-loom {
-	accessWidenerPath = file("src/main/resources/dirtnt.accesswidener")
+	flatDir { dir "." }
 }
 
 dependencies {
@@ -25,7 +22,8 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	include implementation(project(path: ":stitch", configuration: 'namedElements'))
-	modImplementation("net.devtech:arrp:${project.arrp_version}")
+//	modImplementation("net.devtech:arrp:${project.arrp_version}")
+	modImplementation("net.devtech:brrp-fabric:0.8.1-1.19.3")
 }
 
 processResources {
