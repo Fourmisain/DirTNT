@@ -2,8 +2,10 @@ package fourmisain.dirtnt.entity;
 
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.Dirtable;
+import fourmisain.dirtnt.block.DirtTntBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.TntEntity;
@@ -79,6 +81,8 @@ public class DirtTntEntity extends TntEntity {
 								return null;
 							}
 
+							igniteDirtTnt(world, pos);
+
 							// test the block's shape for a collision
 							VoxelShape blockShape = ctx.getBlockShape(state, world, pos);
 							BlockHitResult hitResult = world.raycastBlock(ctx.getStart(), ctx.getEnd(), pos, blockShape, state);
@@ -100,6 +104,19 @@ public class DirtTntEntity extends TntEntity {
 					}
 				}
 			}
+		}
+	}
+
+	public static void igniteDirtTnt(World world, BlockPos pos) {
+		if (world.getBlockState(pos).getBlock() instanceof DirtTntBlock dirtTntBlock) {
+			Identifier dirtType = ((Dirtable) dirtTntBlock).getDirtType();
+
+			world.setBlockState(pos, Blocks.AIR.getDefaultState(), Block.NOTIFY_ALL);
+
+			TntEntity tnt = new DirtTntEntity(dirtType, world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+			int t = tnt.getFuse();
+			tnt.setFuse(world.random.nextInt(t / 4) + t / 8);
+			world.spawnEntity(tnt);
 		}
 	}
 }
