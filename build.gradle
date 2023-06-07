@@ -16,6 +16,7 @@ repositories {
 	maven {
 		url 'https://raw.githubusercontent.com/SolidBlock-cn/mvn-repo/main'
 	}
+	flatDir { dir "." }
 }
 
 dependencies {
@@ -24,7 +25,7 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	include implementation(project(path: ":stitch", configuration: 'namedElements'))
-	modImplementation "pers.solid:brrp-fabric:${brrp_version}-${minecraft_version}"
+	modImplementation "pers.solid:brrp-fabric:${brrp_version}-1.20"
 }
 
 processResources {

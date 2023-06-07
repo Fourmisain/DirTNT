@@ -1,15 +1,20 @@
 package fourmisain.dirtnt.block;
 
 import fourmisain.dirtnt.Dirtable;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.minecraft.block.Material;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.MapColor;
 import net.minecraft.block.TntBlock;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 
 public class DirtTntBlock extends TntBlock {
 	public DirtTntBlock(Identifier dirtType) {
-		super(FabricBlockSettings.of(Material.TNT).breakInstantly().sounds(BlockSoundGroup.GRASS));
+		super(AbstractBlock.Settings.create()
+			.mapColor(MapColor.BRIGHT_RED)
+			.breakInstantly()
+			.sounds(BlockSoundGroup.GRASS)
+			.burnable()
+			.solidBlock((blockState, blockView, blockPos) -> false));
 		((Dirtable) this).makeDirty(dirtType);
 	}
 }
