@@ -18,7 +18,7 @@ import java.util.concurrent.Executor;
 @Mixin(value = SpriteLoader.class, priority = 950)
 public abstract class SpriteLoaderMixin {
 	@Shadow
-	public abstract SpriteLoader.StitchResult method_47663(List<SpriteContents> list, int i, Executor executor);
+	public abstract SpriteLoader.StitchResult stitch(List<SpriteContents> list, int i, Executor executor);
 
 	/**
 	 * Adds two inbetween steps to read the original SpriteContents and generate new sprites from them.
@@ -26,24 +26,24 @@ public abstract class SpriteLoaderMixin {
 	 * @author Fourmisain
 	 */
 	@Overwrite
-	public CompletableFuture<SpriteLoader.StitchResult> method_47661(ResourceManager resourceManager, Identifier atlasId, int mipmapLevel, Executor executor) {
+	public CompletableFuture<SpriteLoader.StitchResult> load(ResourceManager resourceManager, Identifier atlasId, int mipmapLevel, Executor executor) {
 		return CompletableFuture.supplyAsync(() -> {
 				StitchImpl.atlasId.set(atlasId); // for use in loadSources/AtlasLoaderAtlasSourceSpriteRegions  mixin
 				return AtlasLoader.of(resourceManager, atlasId).loadSources(resourceManager);
 			}, executor)
-			.thenCompose(list -> SpriteLoader.method_47664(list, executor))
+			.thenCompose(list -> SpriteLoader.loadAll(list, executor))
 			.thenApply(list -> StitchImpl.prepareGenerating(list, atlasId, resourceManager))
 			.thenCompose(stage -> {
 				if (stage.generators().isEmpty()) {
 					return CompletableFuture.completedFuture(stage.current());
 				} else {
 					// start generating sprites, returning the merged list when done
-					return SpriteLoader.method_47664(stage.generators(), executor)
+					return SpriteLoader.loadAll(stage.generators(), executor)
 						.thenApply(list -> ImmutableList.<SpriteContents>builder()
 							.addAll(stage.current())
 							.addAll(list)
 							.build());
 				}
-			}).thenApply(list -> method_47663(list, mipmapLevel, executor));
+			}).thenApply(list -> stitch(list, mipmapLevel, executor));
 	}
 }

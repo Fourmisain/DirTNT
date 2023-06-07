@@ -42,10 +42,10 @@ public class DirtTntEntity extends TntEntity {
 	}
 
 	public static void createDirtExplosion(Identifier dirtType, Entity entity, World world) {
-		if (world.isClient) return;
+		if (world.isClient()) return;
 
 		// emitGameEvent seems to mainly be used for the Sculk Sensor
-		world.emitGameEvent(entity, GameEvent.EXPLODE, new BlockPos(entity.getX(), entity.getY(), entity.getZ()));
+		world.emitGameEvent(entity, GameEvent.EXPLODE, new Vec3d(entity.getX(), entity.getY(), entity.getZ()));
 		world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 4.0F, (1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F);
 
 		// center explosion at the entity

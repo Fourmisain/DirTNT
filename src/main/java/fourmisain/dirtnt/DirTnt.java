@@ -1,23 +1,31 @@
 package fourmisain.dirtnt;
 
-import com.google.gson.JsonObject;
 import fourmisain.dirtnt.block.DirtTntBlock;
 import fourmisain.dirtnt.config.DirTntConfig;
 import fourmisain.dirtnt.config.GsonConfigHelper;
 import fourmisain.dirtnt.entity.DirtTntEntity;
 import fourmisain.dirtnt.mixin.FireBlockAccessor;
-import net.devtech.arrp.api.RRPCallback;
-import net.devtech.arrp.api.RuntimeResourcePack;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.DispenserBlock;
+import net.minecraft.block.TntBlock;
+import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.*;
+import net.minecraft.loot.LootPool;
+import net.minecraft.loot.LootTable;
+import net.minecraft.loot.condition.BlockStatePropertyLootCondition;
+import net.minecraft.loot.condition.SurvivesExplosionLootCondition;
+import net.minecraft.loot.entry.ItemEntry;
+import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
+import net.minecraft.predicate.StatePredicate;
+import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.tag.BlockTags;
@@ -30,17 +38,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pers.solid.brrp.v1.api.RuntimeResourcePack;
+import pers.solid.brrp.v1.fabric.api.RRPCallback;
+import pers.solid.brrp.v1.tag.IdentifiedTagBuilder;
 
 import java.io.IOException;
 import java.util.*;
-
-import static net.devtech.arrp.json.loot.JLootTable.*;
-import static net.devtech.arrp.json.recipe.JIngredient.ingredient;
-import static net.devtech.arrp.json.recipe.JKeys.keys;
-import static net.devtech.arrp.json.recipe.JPattern.pattern;
-import static net.devtech.arrp.json.recipe.JRecipe.shaped;
-import static net.devtech.arrp.json.recipe.JResult.item;
-import static net.devtech.arrp.json.tags.JTag.tag;
 
 public class DirTnt implements ModInitializer {
 	public static final String MOD_ID = "dirtnt";
@@ -104,8 +107,7 @@ public class DirTnt implements ModInitializer {
 		loadConfig();
 
 		FireBlockAccessor fireBlock = (FireBlockAccessor)Blocks.FIRE;
-		JsonObject notUnstable = new JsonObject();
-		notUnstable.addProperty("unstable", "false");
+		IdentifiedTagBuilder<Block> endermanHoldableTagBuilder = IdentifiedTagBuilder.createBlock(BlockTags.ENDERMAN_HOLDABLE);
 
 		for (Identifier dirtType : DIRT_TYPES) {
 			Identifier id = getDirtTntBlockId(dirtType);
@@ -127,38 +129,30 @@ public class DirTnt implements ModInitializer {
 			if (dirt.isEmpty() || dirt.get() == Items.AIR) { // not every block has an associated item (and air is not a valid crafting ingredient)
 				DirTnt.LOGGER.warn("can't auto-gen recipe for dirt type {}", dirtType);
 			} else {
-				RESOURCE_PACK.addRecipe(id, shaped(
-						pattern(
-								"###",
-								"#X#",
-								"###"
-						),
-						keys()
-								.key("#", ingredient().item(dirt.get()))
-								.key("X", ingredient().item(Items.TNT)),
-						item(item)
-				));
+				RESOURCE_PACK.addRecipeAndAdvancement(id, ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, item, 1)
+					.pattern("###")
+					.pattern("#X#")
+					.pattern("###")
+					.input('#', dirt.get())
+					.input('X', Items.TNT)
+					.criterionFromItem(Items.TNT));
 			}
 
 			// auto-gen block loot table
-			RESOURCE_PACK.addLootTable(DirTnt.id("blocks/" + id.getPath()),
-					loot("minecraft:block")
-							.pool(pool()
-									.rolls(1)
-									.bonus(0)
-									.entry(entry()
-											.type("minecraft:item")
-											.name(id.toString())
-											.condition(predicate("minecraft:block_state_property")
-													.parameter("block", id.toString())
-													.parameter("properties", notUnstable))
-									)
-									.condition(predicate("minecraft:survives_explosion"))));
+			RESOURCE_PACK.addLootTable(DirTnt.id("blocks/" + id.getPath()), LootTable.builder()
+				.pool(LootPool.builder()
+					.conditionally(SurvivesExplosionLootCondition.builder())
+					.rolls(ConstantLootNumberProvider.create(1.0F))
+					.with(
+						ItemEntry.builder(block)
+							.conditionally(BlockStatePropertyLootCondition.builder(block)
+								.properties(StatePredicate.Builder.create().exactMatch(TntBlock.UNSTABLE, false)))
+					)));
 
-			// add blocks to "enderman_holdable" tag
-			RESOURCE_PACK.addTag(new Identifier("blocks/" + BlockTags.ENDERMAN_HOLDABLE.id().getPath()),
-					tag().add(id));
+			endermanHoldableTagBuilder.add(id);
 		}
+
+		RESOURCE_PACK.addTag(endermanHoldableTagBuilder);
 
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register(entries -> {
 			for (Identifier dirtType : DIRT_TYPES) {

@@ -57,7 +57,7 @@ public abstract class TntBlockMixin implements Dirtable {
 
 	@Inject(method = "primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/LivingEntity;)V", at = @At("HEAD"), cancellable = true)
 	private static void primeDirtTnt(World world, BlockPos pos, LivingEntity igniter, CallbackInfo ci) {
-		if (DirTnt.dirtyOverride != null && !world.isClient) {
+		if (DirTnt.dirtyOverride != null && !world.isClient()) {
 			DirtTntEntity tntEntity = new DirtTntEntity(DirTnt.dirtyOverride, world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
 			world.spawnEntity(tntEntity);
 			world.playSound(null, tntEntity.getX(), tntEntity.getY(), tntEntity.getZ(), SoundEvents.ENTITY_TNT_PRIMED, SoundCategory.BLOCKS, 1.0F, 1.0F);
@@ -67,7 +67,7 @@ public abstract class TntBlockMixin implements Dirtable {
 
 	@Inject(method = "onDestroyedByExplosion", at = @At("HEAD"), cancellable = true)
 	public void dirtTntDestroyedByExplosion(World world, BlockPos pos, Explosion explosion, CallbackInfo ci) {
-		if (isDirty() && !world.isClient) {
+		if (isDirty() && !world.isClient()) {
 			DirtTntEntity tntEntity = new DirtTntEntity(getDirtType(), world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
 			tntEntity.setFuse((short)(world.random.nextInt(tntEntity.getFuse() / 4) + tntEntity.getFuse() / 8));
 			world.spawnEntity(tntEntity);

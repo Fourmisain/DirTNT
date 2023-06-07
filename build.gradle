@@ -11,9 +11,11 @@ group = project.maven_group
 
 repositories {
 	maven {
-		url = uri("https://storage.googleapis.com/devan-maven/")
+		url 'https://maven.terraformersmc.com/releases'
 	}
-	flatDir { dir "." }
+	maven {
+		url 'https://raw.githubusercontent.com/SolidBlock-cn/mvn-repo/main'
+	}
 }
 
 dependencies {
@@ -22,8 +24,7 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	include implementation(project(path: ":stitch", configuration: 'namedElements'))
-//	modImplementation("net.devtech:arrp:${project.arrp_version}")
-	modImplementation("net.devtech:brrp-fabric:0.8.1-1.19.3")
+	modImplementation "pers.solid:brrp-fabric:${brrp_version}-${minecraft_version}"
 }
 
 processResources {
