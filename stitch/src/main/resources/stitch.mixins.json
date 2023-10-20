@@ -6,7 +6,6 @@
 	"client": [
 		"AtlasLoaderAtlasSourceSpriteRegionsMixin",
 		"SpriteContentsAccessor",
-		"SpriteContentsMixin",
 		"SpriteLoaderMixin"
 	],
 	"injectors": {

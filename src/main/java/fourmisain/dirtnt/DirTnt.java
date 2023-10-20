@@ -164,8 +164,8 @@ public class DirTnt implements ModInitializer {
 	}
 
 	private static ItemStack dispenseDirtTnt(Identifier dirtType, BlockPointer pointer, ItemStack stack) {
-		World world = pointer.getWorld();
-		BlockPos pos = pointer.getPos().offset(pointer.getBlockState().get(DispenserBlock.FACING));
+		World world = pointer.world();
+		BlockPos pos = pointer.pos().offset(pointer.state().get(DispenserBlock.FACING));
 		DirtTntEntity tntEntity = new DirtTntEntity(dirtType, world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
 		world.spawnEntity(tntEntity);
 		world.playSound(null, tntEntity.getX(), tntEntity.getY(), tntEntity.getZ(), SoundEvents.ENTITY_TNT_PRIMED, SoundCategory.BLOCKS, 1.0F, 1.0F);

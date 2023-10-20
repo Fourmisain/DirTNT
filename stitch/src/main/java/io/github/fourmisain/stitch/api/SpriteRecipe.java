@@ -1,10 +1,10 @@
 package io.github.fourmisain.stitch.api;
 
-import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.client.texture.SpriteDimensions;
 import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.metadata.ResourceMetadata;
 import net.minecraft.util.Identifier;
 
 import java.util.Set;
@@ -40,7 +40,7 @@ public interface SpriteRecipe {
 
 	SpriteDimensions generateSize();
 
-	AnimationResourceMetadata generateAnimationData() ;
+	ResourceMetadata generateResourceMetadata() ;
 
 	NativeImage generateImage(ResourceManager resourceManager);
 }

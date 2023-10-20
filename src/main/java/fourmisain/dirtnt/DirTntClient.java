@@ -17,6 +17,7 @@ import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 public class DirTntClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
+		// TODO use ModelLoadingPlugin
 		ModelLoadingRegistry.INSTANCE.registerVariantProvider((manager) -> (modelId, context) -> {
 			if (modelId.getNamespace().equals(DirTnt.MOD_ID)) {
 				return JsonUnbakedModel.deserialize(getCubeBottomTopBlockModelJson(modelId));

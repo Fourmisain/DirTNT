@@ -4,10 +4,10 @@ import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.mixin.MissingSpriteAccessor;
 import io.github.fourmisain.stitch.api.SpriteRecipe;
 import io.github.fourmisain.stitch.api.Stitch;
-import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.*;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.metadata.ResourceMetadata;
 import net.minecraft.util.Identifier;
 
 import java.io.IOException;
@@ -19,7 +19,7 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 	// collected data
 	private int w = 16, h = 16;
 	private NativeImage image;
-	private AnimationResourceMetadata animationData = AnimationResourceMetadata.EMPTY;
+	private ResourceMetadata resourceMetadata = ResourceMetadata.NONE;
 
 	private final String side;
 	private final Identifier id;
@@ -50,7 +50,7 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 		this.w = sprite.getWidth();
 		this.h = sprite.getHeight();
 		this.image = Stitch.getImage(sprite);
-		this.animationData = Stitch.getAnimationData(sprite);
+		this.resourceMetadata = Stitch.getResourceMetadata(sprite);
 	}
 
 	@Override
@@ -59,8 +59,8 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 	}
 
 	@Override
-	public AnimationResourceMetadata generateAnimationData() {
-		return animationData;
+	public ResourceMetadata generateResourceMetadata() {
+		return resourceMetadata;
 	}
 
 	@Override

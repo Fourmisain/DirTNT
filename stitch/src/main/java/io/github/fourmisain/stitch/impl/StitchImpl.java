@@ -1,11 +1,12 @@
 package io.github.fourmisain.stitch.impl;
 
 import io.github.fourmisain.stitch.api.SpriteRecipe;
-import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.client.texture.SpriteDimensions;
+import net.minecraft.client.texture.SpriteOpener;
 import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.metadata.ResourceMetadata;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 /*
  * 1.19.3 rewrote texture stiching:
@@ -39,7 +40,7 @@ public class StitchImpl {
 
 	public static final ThreadLocal<Identifier> atlasId = ThreadLocal.withInitial(() -> null);
 
-	public record SpritesStage(List<SpriteContents> current, List<Supplier<SpriteContents>> generators) {}
+	public record SpritesStage(List<SpriteContents> current, List<Function<SpriteOpener, SpriteContents>> generators) {}
 
 	public static SpritesStage prepareGenerating(List<SpriteContents> sprites, Identifier atlasId, ResourceManager resourceManager) {
 		Map<Identifier, SpriteRecipe> recipeMap = StitchImpl.atlasRecipes.getOrDefault(atlasId, Map.of());
@@ -53,21 +54,21 @@ public class StitchImpl {
 			}
 		}
 
-		List<Supplier<SpriteContents>> generators = new ArrayList<>();
+		List<Function<SpriteOpener, SpriteContents>> generators = new ArrayList<>();
 
 		for (var entry : recipeMap.entrySet()) {
 			Identifier id = entry.getKey();
 			SpriteRecipe recipe = entry.getValue();
 
-			generators.add(() -> {
+			generators.add(spriteOpener -> {
 				// actually generate the sprite
 				SpriteDimensions size = recipe.generateSize();
-				AnimationResourceMetadata animationData = recipe.generateAnimationData();
+				ResourceMetadata metadata = recipe.generateResourceMetadata();
 				NativeImage image = recipe.generateImage(resourceManager);
 
 				if (image == null) return null; // turn into missing texture
 
-				return new SpriteContents(id, size, image, animationData);
+				return new SpriteContents(id, size, image, metadata);
 			});
 		}
 
