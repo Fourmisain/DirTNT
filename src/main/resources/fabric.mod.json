@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "dirtnt",
-	"version": "${version}",
+	"version": "${mod_version}",
 	"name": "DirTNT",
 	"description": "Adds Dirt TNT, which can be used to fill small holes in the ground",
 	"authors": [
