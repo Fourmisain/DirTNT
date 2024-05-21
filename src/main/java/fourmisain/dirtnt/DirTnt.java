@@ -6,15 +6,12 @@ import fourmisain.dirtnt.config.GsonConfigHelper;
 import fourmisain.dirtnt.entity.DirtTntEntity;
 import fourmisain.dirtnt.mixin.FireBlockAccessor;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.TntBlock;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
-import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.*;
@@ -48,8 +45,6 @@ import java.util.*;
 public class DirTnt implements ModInitializer {
 	public static final String MOD_ID = "dirtnt";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
-
-	public static final RuntimeResourcePack RESOURCE_PACK = RuntimeResourcePack.create(DirTnt.id(MOD_ID));
 
 	public static final Set<Identifier> DIRT_TYPES = new LinkedHashSet<>();
 
@@ -106,6 +101,8 @@ public class DirTnt implements ModInitializer {
 	public void onInitialize() {
 		loadConfig();
 
+		RuntimeResourcePack RESOURCE_PACK = RuntimeResourcePack.create(DirTnt.id(MOD_ID));
+
 		FireBlockAccessor fireBlock = (FireBlockAccessor)Blocks.FIRE;
 		IdentifiedTagBuilder<Block> endermanHoldableTagBuilder = IdentifiedTagBuilder.createBlock(BlockTags.ENDERMAN_HOLDABLE);
 
@@ -114,7 +111,7 @@ public class DirTnt implements ModInitializer {
 
 			// register dirt tnt
 			DirtTntBlock block = Registry.register(Registries.BLOCK, id, new DirtTntBlock(dirtType));
-			BlockItem item = Registry.register(Registries.ITEM, id, new BlockItem(block, new FabricItemSettings()));
+			BlockItem item = Registry.register(Registries.ITEM, id, new BlockItem(block, new Item.Settings()));
 			EntityType<DirtTntEntity> entityType = Registry.register(Registries.ENTITY_TYPE, id, createDirtTntEntityType(dirtType));
 			BLOCK_MAP.put(dirtType, block);
 			ITEM_MAP.put(dirtType, item);
@@ -175,13 +172,12 @@ public class DirTnt implements ModInitializer {
 	}
 
 	private EntityType<DirtTntEntity> createDirtTntEntityType(Identifier dirtType) {
-		return FabricEntityTypeBuilder.create()
-				.<DirtTntEntity>entityFactory((entityType, world) -> new DirtTntEntity(dirtType, entityType, world))
-				.spawnGroup(SpawnGroup.MISC)
-				.fireImmune()
-				.dimensions(EntityDimensions.fixed(0.98F, 0.98F))
-				.trackRangeBlocks(10)
-				.trackedUpdateRate(10)
+		return EntityType.Builder.<DirtTntEntity>create((entityType, world) -> new DirtTntEntity(dirtType, entityType, world), SpawnGroup.MISC)
+				.makeFireImmune()
+				.dimensions(0.98F, 0.98F)
+				.eyeHeight(0.15F)
+				.maxTrackingRange(10)
+				.trackingTickInterval(10)
 				.build();
 	}
 }

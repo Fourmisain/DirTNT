@@ -40,7 +40,7 @@ public abstract class TntBlockMixin implements Dirtable {
 		DirTnt.dirtyOverride = getDirtType();
 	}
 
-	@Inject(method = {"onUse"}, at = @At("HEAD"))
+	@Inject(method = {"onUseWithItem"}, at = @At("HEAD"))
 	private void enableTntDirtOverride(CallbackInfoReturnable<ActionResult> cir) {
 		DirTnt.dirtyOverride = getDirtType();
 	}
@@ -50,7 +50,7 @@ public abstract class TntBlockMixin implements Dirtable {
 		DirTnt.dirtyOverride = null;
 	}
 
-	@Inject(method = {"onUse"}, at = @At("RETURN"))
+	@Inject(method = {"onUseWithItem"}, at = @At("RETURN"))
 	private void disableTntDirtOverride(CallbackInfoReturnable<ActionResult> cir) {
 		DirTnt.dirtyOverride = null;
 	}

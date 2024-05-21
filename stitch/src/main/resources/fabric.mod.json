@@ -14,7 +14,7 @@
 	},
 	"license": "MIT",
 	"icon": "assets/stitch/icon.png",
-	"environment": "*",
+	"environment": "client",
 	"mixins": [
 		"stitch.mixins.json"
 	],

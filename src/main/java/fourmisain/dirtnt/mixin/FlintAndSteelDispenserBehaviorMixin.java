@@ -15,18 +15,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 /**
- * This is a slightly convoluted way to change the FLINT_AND_STEEL dispenser behavior.
- *
- * Using View -> Show Bytecode on FLINT_AND_STEEL's DispenserBehavior actually shows DispenserBehavior$18, which is the GLOWSTONE one.
- * To view the correct bytecode, select ARMOR_STAND's DispenserBehavior.
- *
- * From there, the dirtyOverride is used to switch the TntBlock.primeTnt() behavior for Dirt TNT.
+ * Modifies the FLINT_AND_STEEL dispenser behavior to light Dirt TNT
  *
  * This mixin may be replaced with an additional world.getBlockState(pos).getBlock() check inside overridePrimeTnt(),
  * since the FLINT_AND_STEEL DispenserBehavior removes the block *after* priming the TNT.
  * This is a tad more efficient though.
  */
-@Mixin(targets = "net.minecraft.block.dispenser.DispenserBehavior$10")
+@Mixin(targets = "net.minecraft.block.dispenser.DispenserBehavior$17")
 public abstract class FlintAndSteelDispenserBehaviorMixin {
 	@Inject(method = "dispenseSilently(Lnet/minecraft/util/math/BlockPointer;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;",
 			at = @At(

@@ -4,8 +4,6 @@ import fourmisain.dirtnt.client.DirtTntEntityRenderer;
 import fourmisain.dirtnt.client.DirtTntSpriteRecipe;
 import io.github.fourmisain.stitch.api.Stitch;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.model.loading.v1.DelegatingUnbakedModel;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
@@ -16,7 +14,6 @@ import net.minecraft.util.Identifier;
 import static fourmisain.dirtnt.DirTnt.BLOCK_MAP;
 import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 
-@Environment(EnvType.CLIENT)
 public class DirTntClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {

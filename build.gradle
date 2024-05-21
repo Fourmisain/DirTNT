@@ -31,7 +31,7 @@ subprojects {
 }
 
 allprojects {
-	version = project.mod_version
+	version = project.mod_version + '-' + minecraft_version
 	group = project.maven_group
 
 	base {
