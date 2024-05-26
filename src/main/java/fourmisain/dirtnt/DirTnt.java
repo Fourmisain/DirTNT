@@ -49,8 +49,6 @@ public class DirTnt implements ModInitializer {
 	public static final String MOD_ID = "dirtnt";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
-	public static final RuntimeResourcePack RESOURCE_PACK = RuntimeResourcePack.create(DirTnt.id(MOD_ID));
-
 	public static final Set<Identifier> DIRT_TYPES = new LinkedHashSet<>();
 
 	// used to override TntBlock.primeTnt() behavior
@@ -105,6 +103,8 @@ public class DirTnt implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		loadConfig();
+
+		RuntimeResourcePack RESOURCE_PACK = RuntimeResourcePack.create(DirTnt.id(MOD_ID));
 
 		FireBlockAccessor fireBlock = (FireBlockAccessor)Blocks.FIRE;
 		IdentifiedTagBuilder<Block> endermanHoldableTagBuilder = IdentifiedTagBuilder.createBlock(BlockTags.ENDERMAN_HOLDABLE);

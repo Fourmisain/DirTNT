@@ -90,7 +90,7 @@ public class DirtTntEntity extends TntEntity {
 							// if nothing was hit
 							if (hitResult == null) {
 								// place dirt if possible
-								if (state.getMaterial().isReplaceable()) {
+								if (state.isReplaceable()) {
 									world.setBlockState(pos, dirtBlock.getDefaultState());
 								}
 

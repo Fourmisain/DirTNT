@@ -16,7 +16,7 @@ public class SpriteContentsMixin implements AnimationDataAccess {
 	private AnimationResourceMetadata stitch$animationData;
 
 	@Inject(method = "<init>", at = @At("RETURN"))
-	public void f(Identifier id, SpriteDimensions dimensions, NativeImage image, AnimationResourceMetadata animationData, CallbackInfo ci) {
+	public void setAnimationData(Identifier id, SpriteDimensions dimensions, NativeImage image, AnimationResourceMetadata animationData, CallbackInfo ci) {
 		stitch$animationData = animationData;
 	}
 

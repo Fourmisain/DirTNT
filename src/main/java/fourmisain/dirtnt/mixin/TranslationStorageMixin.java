@@ -3,8 +3,6 @@ package fourmisain.dirtnt.mixin;
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.block.DirtTntBlock;
 import fourmisain.dirtnt.entity.DirtTntEntity;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.client.resource.language.TranslationStorage;
 import net.minecraft.entity.EntityType;
@@ -23,7 +21,6 @@ import java.util.Optional;
 
 import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 
-@Environment(value= EnvType.CLIENT)
 @Mixin(TranslationStorage.class)
 public abstract class TranslationStorageMixin {
 	@Inject(
