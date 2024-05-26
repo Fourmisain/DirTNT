@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "stitch",
-	"version": "${version}",
+	"version": "${mod_version}",
 	"name": "Stitch",
 	"description": "Sprite Texture Atlas Stitching API Library Fabric Mod",
 	"authors": [
@@ -14,7 +14,7 @@
 	},
 	"license": "MIT",
 	"icon": "assets/stitch/icon.png",
-	"environment": "*",
+	"environment": "client",
 	"mixins": [
 		"stitch.mixins.json"
 	],

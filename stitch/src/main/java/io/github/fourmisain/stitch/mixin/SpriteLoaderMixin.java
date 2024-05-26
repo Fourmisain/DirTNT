@@ -10,6 +10,7 @@ import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -27,12 +28,18 @@ public abstract class SpriteLoaderMixin {
 	 */
 	@Overwrite
 	public CompletableFuture<SpriteLoader.StitchResult> load(ResourceManager resourceManager, Identifier atlasId, int mipmapLevel, Executor executor) {
-		return CompletableFuture.supplyAsync(() -> {
+		var future = CompletableFuture.supplyAsync(() -> {
 				StitchImpl.atlasId.set(atlasId); // for use in loadSources/AtlasLoaderAtlasSourceSpriteRegions  mixin
 				return AtlasLoader.of(resourceManager, atlasId).loadSources(resourceManager);
 			}, executor)
-			.thenCompose(list -> SpriteLoader.loadAll(list, executor))
-			.thenApply(list -> StitchImpl.prepareGenerating(list, atlasId, resourceManager))
+			.thenCompose(list -> SpriteLoader.loadAll(list, executor));
+		return stitch$stitchSteps(resourceManager, atlasId, executor, future)
+			.thenApply(list -> stitch(list, mipmapLevel, executor));
+	}
+
+	@Unique
+	private static CompletableFuture<List<SpriteContents>> stitch$stitchSteps(ResourceManager resourceManager, Identifier atlasId, Executor executor, CompletableFuture<List<SpriteContents>> future) {
+		return future.thenApply(list -> StitchImpl.prepareGenerating(list, atlasId, resourceManager))
 			.thenCompose(stage -> {
 				if (stage.generators().isEmpty()) {
 					return CompletableFuture.completedFuture(stage.current());
@@ -44,6 +51,6 @@ public abstract class SpriteLoaderMixin {
 							.addAll(list)
 							.build());
 				}
-			}).thenApply(list -> stitch(list, mipmapLevel, executor));
+			});
 	}
 }

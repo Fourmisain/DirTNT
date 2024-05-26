@@ -2,8 +2,6 @@ package fourmisain.dirtnt.mixin;
 
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.Dirtable;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.entity.TntEntityRenderer;
 import net.minecraft.util.Identifier;
@@ -13,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 /** Allow TNT renderer to be dirty */
-@Environment(EnvType.CLIENT)
 @Mixin(TntEntityRenderer.class)
 public abstract class TntEntityRendererMixin implements Dirtable {
 	@Unique
