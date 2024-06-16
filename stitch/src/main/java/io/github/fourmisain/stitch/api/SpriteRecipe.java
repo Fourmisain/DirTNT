@@ -26,7 +26,7 @@ public interface SpriteRecipe {
 	 *   minecraft:particles
 	 */
 	default Identifier getAtlasId() {
-		return new Identifier("blocks"); // corresponds to BLOCK_ATLAS_TEXTURE
+		return Identifier.ofVanilla("blocks"); // corresponds to BLOCK_ATLAS_TEXTURE
 	}
 
 	/** Which sprites this recipe depends on. */

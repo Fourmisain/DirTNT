@@ -8,10 +8,10 @@ import java.util.Set;
 public class DirTntConfig {
 
     public Set<Identifier> dirtTypes = ImmutableSet.of(
-			new Identifier("minecraft", "dirt"),
-			new Identifier("minecraft", "stone"),
-			new Identifier("minecraft", "sand"),
-			new Identifier("minecraft", "gravel")
+			Identifier.ofVanilla("dirt"),
+			Identifier.ofVanilla("stone"),
+			Identifier.ofVanilla("sand"),
+			Identifier.ofVanilla("gravel")
     );
 
 	public boolean enableAll = false;

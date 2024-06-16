@@ -1,5 +1,6 @@
 package fourmisain.dirtnt.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.block.DirtTntBlock;
 import fourmisain.dirtnt.entity.DirtTntEntity;
@@ -13,7 +14,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.List;
 import java.util.Map;
@@ -25,10 +25,10 @@ import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 public abstract class TranslationStorageMixin {
 	@Inject(
 			method = "load(Lnet/minecraft/resource/ResourceManager;Ljava/util/List;Z)Lnet/minecraft/client/resource/language/TranslationStorage;",
-			at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableMap;copyOf(Ljava/util/Map;)Lcom/google/common/collect/ImmutableMap;", remap = false),
-			locals = LocalCapture.CAPTURE_FAILHARD
+			at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableMap;copyOf(Ljava/util/Map;)Lcom/google/common/collect/ImmutableMap;", remap = false)
 	)
-	private static void dirtnt$addDependentTranslations(ResourceManager resourceManager, List<String> definitions, boolean rightToLeft, CallbackInfoReturnable<TranslationStorage> cir, Map<String, String> translations) {
+	private static void dirtnt$addDependentTranslations(ResourceManager resourceManager, List<String> definitions, boolean rightToLeft, CallbackInfoReturnable<TranslationStorage> cir,
+	        @Local Map<String, String> translations) {
 		for (Identifier dirtType : DIRT_TYPES) {
 			Optional<Block> block = Registries.BLOCK.getOrEmpty(dirtType);
 			if (block.isEmpty()) continue;

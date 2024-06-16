@@ -56,7 +56,7 @@ public class DirTnt implements ModInitializer {
 	public static final Map<Identifier, EntityType<DirtTntEntity>> ENTITY_TYPE_MAP = new HashMap<>();
 
 	public static Identifier id(String id) {
-		return new Identifier(MOD_ID, id);
+		return Identifier.of(MOD_ID, id);
 	}
 
 	/** Block and Item ID */

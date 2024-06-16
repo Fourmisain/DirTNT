@@ -4,6 +4,17 @@ plugins {
 }
 
 repositories {
+	exclusiveContent {
+		forRepository {
+			maven {
+				name = "Modrinth"
+				url = "https://api.modrinth.com/maven"
+			}
+		}
+		filter {
+			includeGroup "maven.modrinth"
+		}
+	}
 	maven {
 		url 'https://maven.terraformersmc.com/releases'
 	}
@@ -20,7 +31,8 @@ dependencies {
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	include implementation(project(path: ":stitch", configuration: 'namedElements'))
-	modImplementation "pers.solid:brrp-fabric:${brrp_version}"
+	modImplementation "maven.modrinth:brrp:1.0.3-mc1.21-fabric"
+	// modImplementation "pers.solid:brrp-fabric:${brrp_version}"
 }
 
 subprojects {

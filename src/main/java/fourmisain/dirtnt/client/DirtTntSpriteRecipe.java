@@ -30,11 +30,11 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 	public DirtTntSpriteRecipe(Identifier dirtType, String side) {
 		this.side = side;
 		Identifier blockId = DirTnt.getDirtTntBlockId(dirtType);
-		this.id = new Identifier(blockId.getNamespace(), "block/" + blockId.getPath() + "_" + side);
+		this.id = Identifier.of(blockId.getNamespace(), "block/" + blockId.getPath() + "_" + side);
 
 		// note: this doesn't always correspond to the block's sprite, e.g. the dark_oak_button block uses the dark_oak_planks sprite
 		// collectSpriteData() will therefore not be called for it
-		this.dirtTexture = new Identifier(dirtType.getNamespace(), "block/" + dirtType.getPath());
+		this.dirtTexture = Identifier.of(dirtType.getNamespace(), "block/" + dirtType.getPath());
 	}
 
 	@Override

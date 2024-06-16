@@ -1,9 +1,9 @@
 package fourmisain.dirtnt.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.Dirtable;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.FireBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
@@ -12,7 +12,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(FireBlock.class)
 public abstract class FireBlockMixin {
@@ -20,9 +19,9 @@ public abstract class FireBlockMixin {
 			at = @At(
 					value = "INVOKE",
 					target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V"
-			),
-			locals = LocalCapture.CAPTURE_FAILHARD)
-	private void enableBurningTntDirtOverride(World world, BlockPos pos, int spreadFactor, Random random, int currentAge, CallbackInfo ci, int i, BlockState blockState, Block block) {
+			))
+	private void enableBurningTntDirtOverride(World world, BlockPos pos, int spreadFactor, Random random, int currentAge, CallbackInfo ci,
+			@Local Block block) {
 		DirTnt.dirtyOverride = ((Dirtable) block).getDirtType();
 	}
 

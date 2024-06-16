@@ -36,6 +36,6 @@ public class Stitch {
 	}
 
 	public static Identifier getTextureResourcePath(Identifier id) {
-		return new Identifier(id.getNamespace(), String.format("textures/%s%s", id.getPath(), ".png"));
+		return Identifier.of(id.getNamespace(), String.format("textures/%s%s", id.getPath(), ".png"));
 	}
 }
