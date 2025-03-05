@@ -15,22 +15,26 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(FireBlock.class)
 public abstract class FireBlockMixin {
-	@Inject(method = "trySpreadingFire",
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V"
-			))
+	@Inject(
+		method = "trySpreadingFire",
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V"
+		)
+	)
 	private void enableBurningTntDirtOverride(World world, BlockPos pos, int spreadFactor, Random random, int currentAge, CallbackInfo ci,
 			@Local Block block) {
 		DirTnt.dirtyOverride = ((Dirtable) block).getDirtType();
 	}
 
-	@Inject(method = "trySpreadingFire",
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V",
-					shift = At.Shift.AFTER
-			))
+	@Inject(
+		method = "trySpreadingFire",
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V",
+			shift = At.Shift.AFTER
+		)
+	)
 	private void disableBurningTntDirtOverride(World world, BlockPos pos, int spreadFactor, Random random, int currentAge, CallbackInfo ci) {
 		DirTnt.dirtyOverride = null;
 	}

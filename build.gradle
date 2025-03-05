@@ -1,6 +1,15 @@
 plugins {
-	id 'fabric-loom' version '1.6-SNAPSHOT'
+	id 'fabric-loom' version '1.10-SNAPSHOT'
 	id 'maven-publish'
+}
+
+loom {
+	runs {
+		client {
+			vmArgs "-Dmixin.debug.export=true"
+			programArgs "--username", "Test"
+		}
+	}
 }
 
 repositories {
@@ -16,12 +25,8 @@ repositories {
 		}
 	}
 	maven {
-		url 'https://maven.terraformersmc.com/releases'
+		url = 'https://maven.terraformersmc.com/releases'
 	}
-	maven {
-		url 'https://raw.githubusercontent.com/SolidBlock-cn/mvn-repo/main'
-	}
-	flatDir { dir "." }
 }
 
 dependencies {
@@ -30,9 +35,8 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	include implementation(project(path: ":stitch", configuration: 'namedElements'))
-	modImplementation "maven.modrinth:brrp:1.0.3-mc1.21-fabric"
-	// modImplementation "pers.solid:brrp-fabric:${brrp_version}"
+	api project(path: ":stitch", configuration: 'namedElements')
+	include project(":stitch")
 }
 
 subprojects {
@@ -50,13 +54,11 @@ allprojects {
 	processResources {
 		// expand all properties from gradle.properties
 		def stringProperties = project.properties.findAll { it.value instanceof String }
-		stringProperties.each { inputs.property(it.key, it.value) }
+		inputs.properties(stringProperties)
 
-		['*.mod.json', '*.mixins.json'].each {
-			filesMatching(it) {
-				expand(stringProperties) {
-					escapeBackslash = true
-				}
+		filesMatching(['*.mod.json', '*.mixins.json']) {
+			expand(stringProperties) {
+				escapeBackslash = true
 			}
 		}
 	}
@@ -72,8 +74,10 @@ allprojects {
 	}
 
 	jar {
+		inputs.property "archivesName", project.base.archivesName
+
 		from("LICENSE") {
-			rename { "${it}_${project.base.archivesName.get()}" }
+			rename { "${it}_${inputs.properties.archivesName}"}
 		}
 	}
 }

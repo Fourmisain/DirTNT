@@ -18,24 +18,28 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * since the FLINT_AND_STEEL DispenserBehavior removes the block *after* priming the TNT.
  * This is a tad more efficient though.
  */
-@Mixin(targets = "net.minecraft.block.dispenser.DispenserBehavior$17")
+@Mixin(targets = "net.minecraft.block.dispenser.DispenserBehavior$14")
 public abstract class FlintAndSteelDispenserBehaviorMixin {
-	@Inject(method = "dispenseSilently(Lnet/minecraft/util/math/BlockPointer;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;",
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V"
-			))
+	@Inject(
+		method = "dispenseSilently(Lnet/minecraft/util/math/BlockPointer;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;",
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V"
+		)
+	)
 	protected void enableDispensedTntDirtOverride(BlockPointer pointer, ItemStack stack, CallbackInfoReturnable<ItemStack> ci,
 			@Local BlockState blockState) {
 		DirTnt.dirtyOverride = ((Dirtable) blockState.getBlock()).getDirtType();
 	}
 
-	@Inject(method = "dispenseSilently(Lnet/minecraft/util/math/BlockPointer;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;",
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V",
-					shift = At.Shift.AFTER
-			))
+	@Inject(
+		method = "dispenseSilently(Lnet/minecraft/util/math/BlockPointer;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;",
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V",
+			shift = At.Shift.AFTER
+		)
+	)
 	protected void disableDispensedTntDirtOverride(BlockPointer pointer, ItemStack stack, CallbackInfoReturnable<ItemStack> ci) {
 		DirTnt.dirtyOverride = null;
 	}

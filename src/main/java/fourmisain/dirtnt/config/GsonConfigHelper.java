@@ -14,31 +14,31 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class GsonConfigHelper {
-    private final Path configPath;
-    private final Gson gson;
+	private final Path configPath;
+	private final Gson gson;
 
-    public GsonConfigHelper(String configName) {
-        this.configPath = FabricLoader.getInstance().getConfigDir().resolve(configName + ".json");
-        this.gson = new GsonBuilder()
-		        .setPrettyPrinting()
-		        .registerTypeAdapter(Identifier.class, IdentifierTypeAdapter.INST)
-		        .disableHtmlEscaping()
-		        .create();
-    }
+	public GsonConfigHelper(String configName) {
+		this.configPath = FabricLoader.getInstance().getConfigDir().resolve(configName + ".json");
+		this.gson = new GsonBuilder()
+				.setPrettyPrinting()
+				.registerTypeAdapter(Identifier.class, IdentifierTypeAdapter.INST)
+				.disableHtmlEscaping()
+				.create();
+	}
 
 	public boolean exists() {
 		return Files.exists(configPath);
 	}
 
-    public <T> T load(Class<T> configType) throws IOException, JsonParseException {
-        try (BufferedReader reader = Files.newBufferedReader(configPath)) {
-            return gson.fromJson(reader, configType);
-        }
-    }
+	public <T> T load(Class<T> configType) throws IOException, JsonParseException {
+		try (BufferedReader reader = Files.newBufferedReader(configPath)) {
+			return gson.fromJson(reader, configType);
+		}
+	}
 
-    public void save(Object config) throws IOException, JsonIOException {
-        try (BufferedWriter writer = Files.newBufferedWriter(configPath)) {
-            gson.toJson(config, writer);
-        }
-    }
+	public void save(Object config) throws IOException, JsonIOException {
+		try (BufferedWriter writer = Files.newBufferedWriter(configPath)) {
+			gson.toJson(config, writer);
+		}
+	}
 }

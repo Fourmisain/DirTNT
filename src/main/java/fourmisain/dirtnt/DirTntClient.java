@@ -11,6 +11,8 @@ import net.minecraft.block.TntBlock;
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
 import net.minecraft.util.Identifier;
 
+import java.io.StringReader;
+
 import static fourmisain.dirtnt.DirTnt.BLOCK_MAP;
 import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 
@@ -33,9 +35,9 @@ public class DirTntClient implements ClientModInitializer {
 					if (path.startsWith("block/")) {
 						// set block model
 						Identifier blockId = id.withPath(p -> p.substring(6));
-						return JsonUnbakedModel.deserialize(getCubeBottomTopBlockModelJson(blockId));
+						return JsonUnbakedModel.deserialize(new StringReader(getCubeBottomTopBlockModelJson(blockId)));
 					} else if (path.startsWith("item/")) {
-						// for some reason we need to manually set the block item model too
+						// replace the dummy item model we set in BakedModelManagerMixin
 						Identifier blockModelId = id.withPath(p -> "block/" + p.substring(5));
 						return new DelegatingUnbakedModel(blockModelId);
 					}

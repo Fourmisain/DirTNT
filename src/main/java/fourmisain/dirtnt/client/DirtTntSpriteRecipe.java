@@ -1,7 +1,6 @@
 package fourmisain.dirtnt.client;
 
 import fourmisain.dirtnt.DirTnt;
-import fourmisain.dirtnt.mixin.MissingSpriteAccessor;
 import io.github.fourmisain.stitch.api.SpriteRecipe;
 import io.github.fourmisain.stitch.api.Stitch;
 import net.minecraft.client.texture.NativeImage;
@@ -86,7 +85,7 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 
 		// use missing texture if block id didn't correspond to texture id
 		if (this.image == null) {
-			this.image = MissingSpriteAccessor.invokeCreateImage(w, h);
+			this.image = Stitch.getMissingSprite(w, h);
 		}
 
 		NativeImage image = new NativeImage(this.image.getWidth(), this.image.getHeight(), false);
@@ -105,10 +104,9 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 				// blend textures together
 				for (int y = 0; y < h; y++) {
 					for (int x = 0; x < w; x++) {
-						image.blend(i * w + x, j * h + y, templateTexture.getColor(x / xScale, y / yScale));
+						Stitch.blendColors(image, i * w + x, j * h + y, templateTexture.getColorArgb(x / xScale, y / yScale));
 					}
 				}
-
 			}
 		}
 

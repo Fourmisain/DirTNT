@@ -1,4 +1,4 @@
-package fourmisain.dirtnt.mixin;
+package io.github.fourmisain.stitch.mixin;
 
 import net.minecraft.client.texture.MissingSprite;
 import net.minecraft.client.texture.NativeImage;

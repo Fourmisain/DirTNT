@@ -9,15 +9,15 @@ import java.io.IOException;
 
 /** Allows Gson to de/serialize Identifiers */
 public class IdentifierTypeAdapter extends TypeAdapter<Identifier> {
-    public static final IdentifierTypeAdapter INST = new IdentifierTypeAdapter();
+	public static final IdentifierTypeAdapter INST = new IdentifierTypeAdapter();
 
-    private IdentifierTypeAdapter() { }
+	private IdentifierTypeAdapter() { }
 
-    public void write(JsonWriter out, Identifier value) throws IOException {
-        out.value(value.toString());
-    }
+	public void write(JsonWriter out, Identifier value) throws IOException {
+		out.value(value.toString());
+	}
 
-    public Identifier read(JsonReader reader) throws IOException {
-        return Identifier.of(reader.nextString());
-    }
+	public Identifier read(JsonReader reader) throws IOException {
+		return Identifier.of(reader.nextString());
+	}
 }

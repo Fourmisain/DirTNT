@@ -56,7 +56,7 @@ public class DirtTntEntity extends TntEntity {
 
 		BlockPos.Mutable targetBlockPos = new BlockPos.Mutable();
 
-		Optional<Block> maybeDirtBlock = Registries.BLOCK.getOrEmpty(dirtType);
+		Optional<Block> maybeDirtBlock = Registries.BLOCK.getOptionalValue(dirtType);
 		if (maybeDirtBlock.isEmpty()) throw new AssertionError("Dirt TNT entity exists but block is not registered!");
 
 		Block dirtBlock = maybeDirtBlock.get();
@@ -70,7 +70,7 @@ public class DirtTntEntity extends TntEntity {
 
 					if (targetBlockPos.isWithinDistance(centerBlockPos, RADIUS + 1)) {
 						RaycastContext context = new RaycastContext(centerVec, targetVec,
-								RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity);
+							RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity);
 
 						// walk through all blocks from the explosion center to the target block
 						BlockView.raycast(context.getStart(), context.getEnd(), context, (ctx, pos) -> {

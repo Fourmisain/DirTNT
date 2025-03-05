@@ -7,25 +7,18 @@ import fourmisain.dirtnt.entity.DirtTntEntity;
 import fourmisain.dirtnt.mixin.FireBlockAccessor;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.DispenserBlock;
-import net.minecraft.block.TntBlock;
-import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.item.*;
-import net.minecraft.loot.LootPool;
-import net.minecraft.loot.LootTable;
-import net.minecraft.loot.condition.BlockStatePropertyLootCondition;
-import net.minecraft.loot.condition.SurvivesExplosionLootCondition;
-import net.minecraft.loot.entry.ItemEntry;
-import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
-import net.minecraft.predicate.StatePredicate;
-import net.minecraft.recipe.book.RecipeCategory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroups;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
@@ -35,12 +28,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pers.solid.brrp.v1.api.RuntimeResourcePack;
-import pers.solid.brrp.v1.fabric.api.RRPCallback;
-import pers.solid.brrp.v1.tag.IdentifiedTagBuilder;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class DirTnt implements ModInitializer {
 	public static final String MOD_ID = "dirtnt";
@@ -101,18 +94,16 @@ public class DirTnt implements ModInitializer {
 	public void onInitialize() {
 		loadConfig();
 
-		RuntimeResourcePack RESOURCE_PACK = RuntimeResourcePack.create(DirTnt.id(MOD_ID));
-
 		FireBlockAccessor fireBlock = (FireBlockAccessor)Blocks.FIRE;
-		IdentifiedTagBuilder<Block> endermanHoldableTagBuilder = IdentifiedTagBuilder.createBlock(BlockTags.ENDERMAN_HOLDABLE);
 
 		for (Identifier dirtType : DIRT_TYPES) {
 			Identifier id = getDirtTntBlockId(dirtType);
 
 			// register dirt tnt
-			DirtTntBlock block = Registry.register(Registries.BLOCK, id, new DirtTntBlock(dirtType));
-			BlockItem item = Registry.register(Registries.ITEM, id, new BlockItem(block, new Item.Settings()));
-			EntityType<DirtTntEntity> entityType = Registry.register(Registries.ENTITY_TYPE, id, createDirtTntEntityType(dirtType));
+			var block = Registry.register(Registries.BLOCK, id,
+				new DirtTntBlock(DirtTntBlock.getDefaultSettings().registryKey(RegistryKey.of(RegistryKeys.BLOCK, id)), dirtType));
+			var item = Items.register(block, new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, id)));
+			var entityType = Registry.register(Registries.ENTITY_TYPE, id, createDirtTntEntityType(dirtType, id));
 			BLOCK_MAP.put(dirtType, block);
 			ITEM_MAP.put(dirtType, item);
 			ENTITY_TYPE_MAP.put(dirtType, entityType);
@@ -120,44 +111,13 @@ public class DirTnt implements ModInitializer {
 			DispenserBlock.registerBehavior(item, (pointer, stack) -> dispenseDirtTnt(dirtType, pointer, stack));
 
 			fireBlock.invokeRegisterFlammableBlock(block, 15, 100);
-
-			// auto-gen recipe
-			Optional<Item> dirt = Registries.ITEM.getOrEmpty(dirtType);
-			if (dirt.isEmpty() || dirt.get() == Items.AIR) { // not every block has an associated item (and air is not a valid crafting ingredient)
-				DirTnt.LOGGER.warn("can't auto-gen recipe for dirt type {}", dirtType);
-			} else {
-				RESOURCE_PACK.addRecipeAndAdvancement(id, ShapedRecipeJsonBuilder.create(RecipeCategory.REDSTONE, item, 1)
-					.pattern("###")
-					.pattern("#X#")
-					.pattern("###")
-					.input('#', dirt.get())
-					.input('X', Items.TNT)
-					.criterionFromItem(Items.TNT));
-			}
-
-			// auto-gen block loot table
-			RESOURCE_PACK.addLootTable(DirTnt.id("blocks/" + id.getPath()), LootTable.builder()
-				.pool(LootPool.builder()
-					.conditionally(SurvivesExplosionLootCondition.builder())
-					.rolls(ConstantLootNumberProvider.create(1.0F))
-					.with(
-						ItemEntry.builder(block)
-							.conditionally(BlockStatePropertyLootCondition.builder(block)
-								.properties(StatePredicate.Builder.create().exactMatch(TntBlock.UNSTABLE, false)))
-					)));
-
-			endermanHoldableTagBuilder.add(id);
 		}
-
-		RESOURCE_PACK.addTag(endermanHoldableTagBuilder);
 
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register(entries -> {
 			for (Identifier dirtType : DIRT_TYPES) {
 				entries.add(ITEM_MAP.get(dirtType));
 			}
 		});
-
-		RRPCallback.BEFORE_VANILLA.register(listener -> listener.add(RESOURCE_PACK));
 	}
 
 	private static ItemStack dispenseDirtTnt(Identifier dirtType, BlockPointer pointer, ItemStack stack) {
@@ -171,13 +131,69 @@ public class DirTnt implements ModInitializer {
 		return stack;
 	}
 
-	private EntityType<DirtTntEntity> createDirtTntEntityType(Identifier dirtType) {
+	private EntityType<DirtTntEntity> createDirtTntEntityType(Identifier dirtType, Identifier id) {
 		return EntityType.Builder.<DirtTntEntity>create((entityType, world) -> new DirtTntEntity(dirtType, entityType, world), SpawnGroup.MISC)
-				.makeFireImmune()
-				.dimensions(0.98F, 0.98F)
-				.eyeHeight(0.15F)
-				.maxTrackingRange(10)
-				.trackingTickInterval(10)
-				.build();
+			.dropsNothing()
+			.makeFireImmune()
+			.dimensions(0.98F, 0.98F)
+			.eyeHeight(0.15F)
+			.maxTrackingRange(10)
+			.trackingTickInterval(10)
+			.build(RegistryKey.of(RegistryKeys.ENTITY_TYPE, id));
+	}
+
+	public static String getRecipeJson(Identifier dirtType, Identifier itemId) {
+		return """
+			{
+			  "type": "minecraft:crafting_shaped",
+			  "category": "redstone",
+			  "pattern": [
+			    "###",
+			    "#X#",
+			    "###"
+			  ],
+			  "key": {
+			    "#": "%s",
+			    "X": "minecraft:tnt"
+			  },
+			  "result": {
+			    "count": 1,
+			    "id": "%s"
+			  }
+			}
+			""".formatted(dirtType, itemId);
+	}
+
+	public static String getLootTableJson(Identifier blockId) {
+		return """
+			{
+			  "type": "minecraft:block",
+			  "pools": [
+			    {
+			      "conditions": [
+			        {
+			          "condition": "minecraft:survives_explosion"
+			        }
+			      ],
+			      "entries": [
+			        {
+			          "type": "minecraft:item",
+			          "conditions": [
+			            {
+			              "block": "%s",
+			              "condition": "minecraft:block_state_property",
+			              "properties": {
+			                "unstable": "false"
+			              }
+			            }
+			          ],
+			          "name": "%s"
+			        }
+			      ],
+			      "rolls": 1
+			    }
+			  ]
+			}
+			""".formatted(blockId, blockId);
 	}
 }

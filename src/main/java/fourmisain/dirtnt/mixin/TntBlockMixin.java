@@ -5,6 +5,7 @@ import fourmisain.dirtnt.Dirtable;
 import fourmisain.dirtnt.entity.DirtTntEntity;
 import net.minecraft.block.TntBlock;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
@@ -66,7 +67,7 @@ public abstract class TntBlockMixin implements Dirtable {
 	}
 
 	@Inject(method = "onDestroyedByExplosion", at = @At("HEAD"), cancellable = true)
-	public void dirtTntDestroyedByExplosion(World world, BlockPos pos, Explosion explosion, CallbackInfo ci) {
+	public void dirtTntDestroyedByExplosion(ServerWorld world, BlockPos pos, Explosion explosion, CallbackInfo ci) {
 		if (isDirty() && !world.isClient()) {
 			DirtTntEntity tntEntity = new DirtTntEntity(getDirtType(), world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
 			tntEntity.setFuse((short)(world.random.nextInt(tntEntity.getFuse() / 4) + tntEntity.getFuse() / 8));

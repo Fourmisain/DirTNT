@@ -7,11 +7,14 @@
 		"FireBlockAccessor",
 		"FireBlockMixin",
 		"FlintAndSteelDispenserBehaviorMixin",
+		"ReloadableRegistriesMixin",
+		"ServerRecipeManagerMixin",
+		"TagGroupLoaderMixin",
 		"TntBlockMixin",
 		"TntEntityMixin"
 	],
 	"client": [
-		"MissingSpriteAccessor",
+		"BakedModelManagerMixin",
 		"TntEntityRendererMixin",
 		"TranslationStorageMixin"
 	],

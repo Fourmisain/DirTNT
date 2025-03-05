@@ -24,13 +24,16 @@ import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 @Mixin(TranslationStorage.class)
 public abstract class TranslationStorageMixin {
 	@Inject(
-			method = "load(Lnet/minecraft/resource/ResourceManager;Ljava/util/List;Z)Lnet/minecraft/client/resource/language/TranslationStorage;",
-			at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableMap;copyOf(Ljava/util/Map;)Lcom/google/common/collect/ImmutableMap;", remap = false)
+		method = "load(Lnet/minecraft/resource/ResourceManager;Ljava/util/List;Z)Lnet/minecraft/client/resource/language/TranslationStorage;",
+		at = @At(
+			value = "INVOKE",
+			target = "Ljava/util/Map;copyOf(Ljava/util/Map;)Ljava/util/Map;"
+		)
 	)
 	private static void dirtnt$addDependentTranslations(ResourceManager resourceManager, List<String> definitions, boolean rightToLeft, CallbackInfoReturnable<TranslationStorage> cir,
-	        @Local Map<String, String> translations) {
+			@Local Map<String, String> translations) {
 		for (Identifier dirtType : DIRT_TYPES) {
-			Optional<Block> block = Registries.BLOCK.getOrEmpty(dirtType);
+			Optional<Block> block = Registries.BLOCK.getOptionalValue(dirtType);
 			if (block.isEmpty()) continue;
 
 			DirtTntBlock tntBlock = DirTnt.BLOCK_MAP.get(dirtType);
