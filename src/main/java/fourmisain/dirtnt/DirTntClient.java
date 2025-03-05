@@ -4,58 +4,48 @@ import fourmisain.dirtnt.client.DirtTntEntityRenderer;
 import fourmisain.dirtnt.client.DirtTntSpriteRecipe;
 import io.github.fourmisain.stitch.api.Stitch;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.model.loading.v1.DelegatingUnbakedModel;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.TntBlock;
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
+import net.minecraft.client.render.model.json.ModelVariantMap;
 import net.minecraft.util.Identifier;
 
 import java.io.StringReader;
+import java.util.List;
 
-import static fourmisain.dirtnt.DirTnt.BLOCK_MAP;
 import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 
 public class DirTntClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		ModelLoadingPlugin.register(pluginContext -> {
-			// add block models
 			for (var dirtType : DIRT_TYPES) {
 				Identifier blockId = DirTnt.getDirtTntBlockId(dirtType);
-				pluginContext.addModels(blockId.withPath(p -> "block/" + p));
-			}
+				Identifier blockModelId = blockId.withPrefixedPath("block/");
 
-			pluginContext.resolveModel().register(context -> {
-				Identifier id = context.id();
+				pluginContext.addModels(blockModelId);
 
-				if (id.getNamespace().equals(DirTnt.MOD_ID)) {
-					String path = id.getPath();
+				pluginContext.registerBlockStateResolver(DirTnt.BLOCK_MAP.get(dirtType), context -> {
+					ModelVariantMap variantMap = ModelVariantMap.fromJson(new StringReader(getBlockStatesJson(blockModelId)));
 
-					if (path.startsWith("block/")) {
-						// set block model
-						Identifier blockId = id.withPath(p -> p.substring(6));
-						return JsonUnbakedModel.deserialize(new StringReader(getCubeBottomTopBlockModelJson(blockId)));
-					} else if (path.startsWith("item/")) {
-						// replace the dummy item model we set in BakedModelManagerMixin
-						Identifier blockModelId = id.withPath(p -> "block/" + p.substring(5));
-						return new DelegatingUnbakedModel(blockModelId);
+					for (var value : List.of(false, true)) {
+						BlockState blockState = context.block().getDefaultState().with(TntBlock.UNSTABLE, value);
+						context.setModel(blockState, variantMap.getVariant(""));
 					}
-				}
-
-				return null;
-			});
-
-			// delegate all block state models to our one block model
-			for (var entry : BLOCK_MAP.entrySet()) {
-				Identifier blockModelId = DirTnt.getDirtTntBlockId(entry.getKey()).withPath(p -> "block/" + p);
-				DelegatingUnbakedModel model = new DelegatingUnbakedModel(blockModelId);
-
-				pluginContext.registerBlockStateResolver(entry.getValue(), blockContext -> {
-					blockContext.setModel(blockContext.block().getDefaultState(), model);
-					blockContext.setModel(blockContext.block().getDefaultState().with(TntBlock.UNSTABLE, true), model);
 				});
 			}
+
+			pluginContext.modifyModelOnLoad().register((unbakedModel, context) -> {
+				Identifier id = context.id();
+
+				if (unbakedModel == null && id.getNamespace().equals(DirTnt.MOD_ID)) {
+					return JsonUnbakedModel.deserialize(new StringReader(getCubeBottomTopBlockModelJson(id)));
+				}
+
+				return unbakedModel;
+			});
 		});
 
 		for (Identifier dirtType : DIRT_TYPES) {
@@ -68,18 +58,38 @@ public class DirTntClient implements ClientModInitializer {
 	}
 
 	public static String getCubeBottomTopBlockModelJson(Identifier modelId) {
-		String namespace = modelId.getNamespace();
-		String path = modelId.getPath();
-
-		return String.format("""
+		return """
 			{
 				"parent": "minecraft:block/cube_bottom_top",
 				"textures": {
-					"top": "%s:block/%s_top",
-					"bottom": "%s:block/%s_bottom",
-					"side": "%s:block/%s_side"
+					"top": "%s_top",
+					"bottom": "%s_bottom",
+					"side": "%s_side"
 				}
 			}
-			""", namespace, path, namespace, path, namespace, path);
+			""".formatted(modelId, modelId, modelId);
+	}
+
+	public static String getBlockStatesJson(Identifier modelId) {
+		return """
+			{
+			  "variants": {
+			    "": {
+			      "model": "%s"
+			    }
+			  }
+			}
+			""".formatted(modelId);
+	}
+
+	public static String getItemsJson(Identifier modelId) {
+		return """
+			{
+			  "model": {
+			    "type": "minecraft:model",
+			    "model": "%s"
+			  }
+			}
+			""".formatted(modelId);
 	}
 }

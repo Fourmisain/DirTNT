@@ -1,44 +1,35 @@
 package io.github.fourmisain.stitch.mixin;
 
 import com.google.common.collect.ImmutableList;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import io.github.fourmisain.stitch.impl.StitchImpl;
 import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.client.texture.SpriteLoader;
 import net.minecraft.client.texture.SpriteOpener;
-import net.minecraft.client.texture.atlas.AtlasLoader;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.metadata.ResourceMetadataReader;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 @Mixin(value = SpriteLoader.class, priority = 950)
 public abstract class SpriteLoaderMixin {
-	@Shadow
-	public abstract SpriteLoader.StitchResult stitch(List<SpriteContents> list, int i, Executor executor);
-
-	/**
-	 * Adds two inbetween steps to read the original SpriteContents and generate new sprites from them.
-	 * @reason See the StitchImpl comment, especially of the previous commit for full explanation for this overwrite.
-	 * @author Fourmisain
-	 */
-	@Overwrite
-	public CompletableFuture<SpriteLoader.StitchResult> load(ResourceManager resourceManager, Identifier atlasId, int mipmapLevel, Executor executor, Collection<ResourceMetadataReader<?>> metadatas) {
-		SpriteOpener spriteOpener = SpriteOpener.create(metadatas);
-		var future = CompletableFuture.supplyAsync(() -> {
-				StitchImpl.atlasId.set(atlasId); // for use in loadSources/AtlasLoaderAtlasSourceSpriteRegions  mixin
-				return AtlasLoader.of(resourceManager, atlasId).loadSources(resourceManager);
-			}, executor)
-			.thenCompose(list -> SpriteLoader.loadAll(spriteOpener, list, executor));
-		return stitch$stitchSteps(resourceManager, atlasId, executor, future, spriteOpener)
-			.thenApply(list -> stitch(list, mipmapLevel, executor));
+	// Adds two in between steps to read the original SpriteContents and generate new sprites from them.
+	@ModifyExpressionValue(
+		method = "load(Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/Identifier;ILjava/util/concurrent/Executor;Ljava/util/Collection;)Ljava/util/concurrent/CompletableFuture;",
+		at = @At(
+			value = "INVOKE",
+			target = "Ljava/util/concurrent/CompletableFuture;thenCompose(Ljava/util/function/Function;)Ljava/util/concurrent/CompletableFuture;"
+		)
+	)
+	public CompletableFuture<List<SpriteContents>> load(CompletableFuture<List<SpriteContents>> original,
+			@Local(argsOnly = true) ResourceManager resourceManager, @Local(argsOnly = true) Identifier atlasId, @Local(argsOnly = true) Executor executor, @Local SpriteOpener spriteOpener) {
+		return stitch$stitchSteps(resourceManager, atlasId, executor, original, spriteOpener);
 	}
 
 	@Unique

@@ -1,0 +1,3 @@
+accessWidener v1 named
+accessible class net/minecraft/client/item/ItemAssetsLoader$Definition
+accessible method net/minecraft/client/item/ItemAssetsLoader$Definition <init> (Lnet/minecraft/util/Identifier;Lnet/minecraft/client/item/ItemAsset;)V

@@ -4,6 +4,8 @@ plugins {
 }
 
 loom {
+	accessWidenerPath = file("src/main/resources/dirtnt.accesswidener")
+
 	runs {
 		client {
 			vmArgs "-Dmixin.debug.export=true"

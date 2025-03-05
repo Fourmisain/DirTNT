@@ -14,7 +14,7 @@
 		"TntEntityMixin"
 	],
 	"client": [
-		"BakedModelManagerMixin",
+		"ItemAssetsLoaderMixin",
 		"TntEntityRendererMixin",
 		"TranslationStorageMixin"
 	],
