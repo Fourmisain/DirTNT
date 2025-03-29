@@ -1,19 +1,17 @@
 package fourmisain.dirtnt;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.mojang.serialization.JsonOps;
 import fourmisain.dirtnt.client.DirtTntEntityRenderer;
 import fourmisain.dirtnt.client.DirtTntSpriteRecipe;
 import io.github.fourmisain.stitch.api.Stitch;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.TntBlock;
-import net.minecraft.client.render.model.json.JsonUnbakedModel;
-import net.minecraft.client.render.model.json.ModelVariantMap;
+import net.minecraft.client.render.model.json.BlockModelDefinition;
 import net.minecraft.util.Identifier;
-
-import java.io.StringReader;
-import java.util.List;
+import net.minecraft.util.JsonHelper;
 
 import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 
@@ -25,27 +23,15 @@ public class DirTntClient implements ClientModInitializer {
 				Identifier blockId = DirTnt.getDirtTntBlockId(dirtType);
 				Identifier blockModelId = blockId.withPrefixedPath("block/");
 
-				pluginContext.addModels(blockModelId);
-
 				pluginContext.registerBlockStateResolver(DirTnt.BLOCK_MAP.get(dirtType), context -> {
-					ModelVariantMap variantMap = ModelVariantMap.fromJson(new StringReader(getBlockStatesJson(blockModelId)));
+					JsonObject jsonElement = JsonHelper.deserialize(getBlockStatesJson(blockModelId));
+					var modelDefinition = BlockModelDefinition.CODEC.parse(JsonOps.INSTANCE, jsonElement).getOrThrow(JsonParseException::new);
 
-					for (var value : List.of(false, true)) {
-						BlockState blockState = context.block().getDefaultState().with(TntBlock.UNSTABLE, value);
-						context.setModel(blockState, variantMap.getVariant(""));
-					}
+					modelDefinition.simpleModels().ifPresent(modelVariants -> {
+						modelVariants.load(context.block().getStateManager(), () -> blockId + "/" + DirTnt.MOD_ID, context::setModel);
+					});
 				});
 			}
-
-			pluginContext.modifyModelOnLoad().register((unbakedModel, context) -> {
-				Identifier id = context.id();
-
-				if (unbakedModel == null && id.getNamespace().equals(DirTnt.MOD_ID)) {
-					return JsonUnbakedModel.deserialize(new StringReader(getCubeBottomTopBlockModelJson(id)));
-				}
-
-				return unbakedModel;
-			});
 		});
 
 		for (Identifier dirtType : DIRT_TYPES) {

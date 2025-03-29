@@ -38,9 +38,9 @@ public class DirtTntEntity extends TntEntity {
 		double angle = world.random.nextDouble() * 2*Math.PI;
 		this.setVelocity(-Math.sin(angle) * 0.02, 0.2, -Math.cos(angle) * 0.02);
 		this.setFuse(80);
-		this.prevX = x;
-		this.prevY = y;
-		this.prevZ = z;
+		this.lastX = x;
+		this.lastY = y;
+		this.lastZ = z;
 	}
 
 	public static void createDirtExplosion(Identifier dirtType, Entity entity, World world) {

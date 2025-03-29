@@ -8,7 +8,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -36,33 +35,34 @@ public abstract class TntBlockMixin implements Dirtable {
 		return dirtType;
 	}
 
-	@Inject(method = {"onBlockAdded", "neighborUpdate", "onBreak", "onProjectileHit"}, at = @At("HEAD"))
+	@Inject(method = {"onBlockAdded", "neighborUpdate", "onProjectileHit"}, at = @At("HEAD"))
 	private void enableTntDirtOverride(CallbackInfo ci) {
 		DirTnt.dirtyOverride = getDirtType();
 	}
 
-	@Inject(method = {"onUseWithItem"}, at = @At("HEAD"))
-	private void enableTntDirtOverride(CallbackInfoReturnable<ActionResult> cir) {
+	@Inject(method = {"onBreak", "onUseWithItem"}, at = @At("HEAD"))
+	private void enableTntDirtOverride(CallbackInfoReturnable<?> cir) {
 		DirTnt.dirtyOverride = getDirtType();
 	}
 
-	@Inject(method = {"onBlockAdded", "neighborUpdate", "onBreak", "onProjectileHit"}, at = @At("RETURN"))
+	@Inject(method = {"onBlockAdded", "neighborUpdate", "onProjectileHit"}, at = @At("RETURN"))
 	private void disableTntDirtOverride(CallbackInfo ci) {
 		DirTnt.dirtyOverride = null;
 	}
 
-	@Inject(method = {"onUseWithItem"}, at = @At("RETURN"))
-	private void disableTntDirtOverride(CallbackInfoReturnable<ActionResult> cir) {
+	@Inject(method = {"onBreak", "onUseWithItem"}, at = @At("RETURN"))
+	private void disableTntDirtOverride(CallbackInfoReturnable<?> cir) {
 		DirTnt.dirtyOverride = null;
 	}
 
-	@Inject(method = "primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/LivingEntity;)V", at = @At("HEAD"), cancellable = true)
-	private static void primeDirtTnt(World world, BlockPos pos, LivingEntity igniter, CallbackInfo ci) {
+	@Inject(method = "primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/LivingEntity;)Z", at = @At("HEAD"), cancellable = true)
+	private static void primeDirtTnt(World world, BlockPos pos, LivingEntity igniter, CallbackInfoReturnable<Boolean> cir) {
 		if (DirTnt.dirtyOverride != null && !world.isClient()) {
 			DirtTntEntity tntEntity = new DirtTntEntity(DirTnt.dirtyOverride, world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
 			world.spawnEntity(tntEntity);
 			world.playSound(null, tntEntity.getX(), tntEntity.getY(), tntEntity.getZ(), SoundEvents.ENTITY_TNT_PRIMED, SoundCategory.BLOCKS, 1.0F, 1.0F);
-			ci.cancel();
+			cir.setReturnValue(true);
+			cir.cancel();
 		}
 	}
 

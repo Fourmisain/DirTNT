@@ -18,13 +18,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * since the FLINT_AND_STEEL DispenserBehavior removes the block *after* priming the TNT.
  * This is a tad more efficient though.
  */
-@Mixin(targets = "net.minecraft.block.dispenser.DispenserBehavior$14")
+@Mixin(targets = "net.minecraft.block.dispenser.DispenserBehavior$12")
 public abstract class FlintAndSteelDispenserBehaviorMixin {
 	@Inject(
 		method = "dispenseSilently(Lnet/minecraft/util/math/BlockPointer;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V"
+			target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z"
 		)
 	)
 	protected void enableDispensedTntDirtOverride(BlockPointer pointer, ItemStack stack, CallbackInfoReturnable<ItemStack> ci,
@@ -36,7 +36,7 @@ public abstract class FlintAndSteelDispenserBehaviorMixin {
 		method = "dispenseSilently(Lnet/minecraft/util/math/BlockPointer;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V",
+			target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z",
 			shift = At.Shift.AFTER
 		)
 	)

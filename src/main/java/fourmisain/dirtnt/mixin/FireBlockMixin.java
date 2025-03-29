@@ -19,7 +19,7 @@ public abstract class FireBlockMixin {
 		method = "trySpreadingFire",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V"
+			target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z"
 		)
 	)
 	private void enableBurningTntDirtOverride(World world, BlockPos pos, int spreadFactor, Random random, int currentAge, CallbackInfo ci,
@@ -31,7 +31,7 @@ public abstract class FireBlockMixin {
 		method = "trySpreadingFire",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V",
+			target = "Lnet/minecraft/block/TntBlock;primeTnt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z",
 			shift = At.Shift.AFTER
 		)
 	)
