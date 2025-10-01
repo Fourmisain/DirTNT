@@ -3,24 +3,28 @@ package fourmisain.dirtnt.client;
 import fourmisain.dirtnt.DirTnt;
 import io.github.fourmisain.stitch.api.SpriteRecipe;
 import io.github.fourmisain.stitch.api.Stitch;
+import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.client.texture.SpriteDimensions;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.metadata.ResourceMetadata;
+import net.minecraft.resource.metadata.ResourceMetadataSerializer;
 import net.minecraft.util.Identifier;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class DirtTntSpriteRecipe implements SpriteRecipe {
 	// collected data
 	private int w = 16, h = 16;
 	private NativeImage image;
-	private ResourceMetadata resourceMetadata = ResourceMetadata.NONE;
+	private Optional<AnimationResourceMetadata> animationResourceMetadata = Optional.empty();
+	private List<ResourceMetadataSerializer.Value<?>> additionalMetadata;
 
 	private final String side;
 	private final Identifier id;
@@ -51,7 +55,8 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 		this.w = sprite.getWidth();
 		this.h = sprite.getHeight();
 		this.image = Stitch.getImage(sprite);
-		this.resourceMetadata = Stitch.getResourceMetadata(sprite);
+		this.animationResourceMetadata = Stitch.getAnimationResourceMetadata(sprite);
+		this.additionalMetadata = Stitch.getAdditionalMetadata(sprite);
 	}
 
 	@Override
@@ -60,8 +65,13 @@ public class DirtTntSpriteRecipe implements SpriteRecipe {
 	}
 
 	@Override
-	public ResourceMetadata generateResourceMetadata() {
-		return resourceMetadata;
+	public Optional<AnimationResourceMetadata> generateAnimationResourceMetadata() {
+		return animationResourceMetadata;
+	}
+
+	@Override
+	public List<ResourceMetadataSerializer.Value<?>> generateAdditionalMetadata() {
+		return additionalMetadata;
 	}
 
 	@Override

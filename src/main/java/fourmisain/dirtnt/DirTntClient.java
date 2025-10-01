@@ -8,7 +8,7 @@ import fourmisain.dirtnt.client.DirtTntSpriteRecipe;
 import io.github.fourmisain.stitch.api.Stitch;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.minecraft.client.render.entity.EntityRendererFactories;
 import net.minecraft.client.render.model.json.BlockModelDefinition;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -35,7 +35,7 @@ public class DirTntClient implements ClientModInitializer {
 		});
 
 		for (Identifier dirtType : DIRT_TYPES) {
-			EntityRendererRegistry.register(DirTnt.ENTITY_TYPE_MAP.get(dirtType), (context) -> new DirtTntEntityRenderer(dirtType, context));
+			EntityRendererFactories.register(DirTnt.ENTITY_TYPE_MAP.get(dirtType), context -> new DirtTntEntityRenderer(dirtType, context));
 
 			Stitch.registerRecipe(new DirtTntSpriteRecipe(dirtType, "side"));
 			Stitch.registerRecipe(new DirtTntSpriteRecipe(dirtType, "top"));

@@ -4,9 +4,10 @@
 	"package": "io.github.fourmisain.stitch.mixin",
 	"compatibilityLevel": "JAVA_${java_version}",
 	"client": [
-		"AtlasLoaderAtlasSourceSpriteRegionsMixin",
+		"AtlasManagerStitchMixin",
 		"MissingSpriteAccessor",
 		"SpriteContentsAccessor",
+		"SpriteContentsMixin",
 		"SpriteLoaderMixin"
 	],
 	"injectors": {

@@ -3,14 +3,17 @@ package io.github.fourmisain.stitch.api;
 import io.github.fourmisain.stitch.impl.StitchImpl;
 import io.github.fourmisain.stitch.mixin.MissingSpriteAccessor;
 import io.github.fourmisain.stitch.mixin.SpriteContentsAccessor;
+import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.SpriteContents;
-import net.minecraft.resource.metadata.ResourceMetadata;
+import net.minecraft.resource.metadata.ResourceMetadataSerializer;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Optional;
 
 public class Stitch {
 	private Stitch() {}
@@ -33,8 +36,13 @@ public class Stitch {
 		return ((SpriteContentsAccessor) sprite).getImage();
 	}
 
-	public static ResourceMetadata getResourceMetadata(@NotNull SpriteContents sprite) {
-		return ((SpriteContentsAccessor) sprite).getResourceMetadata();
+	/** note: returns null after stitching process is done */
+	public static Optional<AnimationResourceMetadata> getAnimationResourceMetadata(@NotNull SpriteContents sprite) {
+		return StitchImpl.animationResources.get(sprite);
+	}
+
+	public static List<ResourceMetadataSerializer.Value<?>> getAdditionalMetadata(@NotNull SpriteContents sprite) {
+		return ((SpriteContentsAccessor) sprite).getAdditionalMetadata();
 	}
 
 	public static Identifier getTextureResourcePath(Identifier id) {

@@ -3,14 +3,17 @@ package fourmisain.dirtnt.entity;
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.Dirtable;
 import fourmisain.dirtnt.block.DirtTntBlock;
+import fourmisain.dirtnt.mixin.WorldAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.TntEntity;
+import net.minecraft.network.packet.s2c.play.ExplosionS2CPacket;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
-import net.minecraft.sound.SoundCategory;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
@@ -48,7 +51,6 @@ public class DirtTntEntity extends TntEntity {
 
 		// emitGameEvent seems to mainly be used for the Sculk Sensor
 		world.emitGameEvent(entity, GameEvent.EXPLODE, new Vec3d(entity.getX(), entity.getY(), entity.getZ()));
-		world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE.value(), SoundCategory.BLOCKS, 4.0F, (1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F);
 
 		// center explosion at the entity
 		BlockPos centerBlockPos = entity.getBlockPos();
@@ -60,6 +62,8 @@ public class DirtTntEntity extends TntEntity {
 		if (maybeDirtBlock.isEmpty()) throw new AssertionError("Dirt TNT entity exists but block is not registered!");
 
 		Block dirtBlock = maybeDirtBlock.get();
+
+		int[] blockCount = new int[1];
 
 		// for every 'target' block within a distance of RADIUS
 		for (int x = -RADIUS; x <= RADIUS; x++) {
@@ -92,6 +96,7 @@ public class DirtTntEntity extends TntEntity {
 								// place dirt if possible
 								if (state.isReplaceable()) {
 									world.setBlockState(pos, dirtBlock.getDefaultState());
+									blockCount[0]++;
 								}
 
 								// and continue
@@ -103,6 +108,13 @@ public class DirtTntEntity extends TntEntity {
 						}, (ctx) -> null);
 					}
 				}
+			}
+		}
+
+		for (var player : ((ServerWorld) world).getPlayers()) {
+			if (player.squaredDistanceTo(centerVec) < 64 * 64) {
+				player.networkHandler.sendPacket(new ExplosionS2CPacket(centerVec, RADIUS + 1, blockCount[0], Optional.empty(),
+					ParticleTypes.EXPLOSION, SoundEvents.ENTITY_GENERIC_EXPLODE, WorldAccessor.getEXPLOSION_BLOCK_PARTICLES()));
 			}
 		}
 	}

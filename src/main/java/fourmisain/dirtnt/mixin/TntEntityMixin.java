@@ -31,7 +31,7 @@ public abstract class TntEntityMixin implements Dirtable {
 		TntEntity self = (TntEntity) (Object) this;
 
 		if (isDirty()) {
-			DirtTntEntity.createDirtExplosion(getDirtType(), self, self.getWorld());
+			DirtTntEntity.createDirtExplosion(getDirtType(), self, self.getEntityWorld());
 			ci.cancel();
 		}
 	}

@@ -11,7 +11,8 @@
 		"ServerRecipeManagerMixin",
 		"TagGroupLoaderMixin",
 		"TntBlockMixin",
-		"TntEntityMixin"
+		"TntEntityMixin",
+		"WorldAccessor"
 	],
 	"client": [
 		"BakedModelManagerMixin",
