@@ -1,6 +1,7 @@
 package io.github.fourmisain.stitch.api;
 
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
+import net.minecraft.client.resource.metadata.TextureResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.client.texture.SpriteDimensions;
@@ -44,6 +45,8 @@ public interface SpriteRecipe {
 	SpriteDimensions generateSize();
 
 	Optional<AnimationResourceMetadata> generateAnimationResourceMetadata();
+
+	Optional<TextureResourceMetadata> generateTextureResourceMetadata();
 
 	List<ResourceMetadataSerializer.Value<?>> generateAdditionalMetadata();
 

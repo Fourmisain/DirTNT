@@ -2,6 +2,7 @@ package io.github.fourmisain.stitch.mixin;
 
 import io.github.fourmisain.stitch.impl.StitchImpl;
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
+import net.minecraft.client.resource.metadata.TextureResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.client.texture.SpriteDimensions;
@@ -17,8 +18,10 @@ import java.util.Optional;
 @Mixin(SpriteContents.class)
 public abstract class SpriteContentsMixin {
 	@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-	@Inject(method = "<init>(Lnet/minecraft/util/Identifier;Lnet/minecraft/client/texture/SpriteDimensions;Lnet/minecraft/client/texture/NativeImage;Ljava/util/Optional;Ljava/util/List;)V", at = @At("RETURN"))
-	public void storeAnimationResourceMetadata(Identifier id, SpriteDimensions dimensions, NativeImage image, Optional<AnimationResourceMetadata> animationResourceMetadata, List<?> additionalMetadata, CallbackInfo ci) {
-		StitchImpl.animationResources.put((SpriteContents) (Object) this, animationResourceMetadata);
+	@Inject(method = "<init>(Lnet/minecraft/util/Identifier;Lnet/minecraft/client/texture/SpriteDimensions;Lnet/minecraft/client/texture/NativeImage;Ljava/util/Optional;Ljava/util/List;Ljava/util/Optional;)V", at = @At("RETURN"))
+	public void storeAnimationResourceMetadata(Identifier id, SpriteDimensions dimensions, NativeImage image, Optional<AnimationResourceMetadata> animationResourceMetadata, List<?> additionalMetadata, Optional<TextureResourceMetadata> textureMetadata, CallbackInfo ci) {
+		var self = (SpriteContents) (Object) this;
+		StitchImpl.animationResources.put(self, animationResourceMetadata);
+		StitchImpl.textureResources.put(self, textureMetadata);
 	}
 }

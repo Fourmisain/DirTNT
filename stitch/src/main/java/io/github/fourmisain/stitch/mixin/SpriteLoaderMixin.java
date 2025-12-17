@@ -7,6 +7,7 @@ import io.github.fourmisain.stitch.impl.StitchImpl;
 import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.client.texture.SpriteLoader;
 import net.minecraft.client.texture.SpriteOpener;
+import net.minecraft.client.texture.atlas.AtlasSource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,12 +18,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.Function;
 
 @Mixin(value = SpriteLoader.class, priority = 950)
 public abstract class SpriteLoaderMixin {
 	@Shadow
-	private static CompletableFuture<List<SpriteContents>> loadAll(SpriteOpener opener, List<Function<SpriteOpener, SpriteContents>> sources, Executor executor) {
+	private static CompletableFuture<List<SpriteContents>> loadAll(SpriteOpener opener, List<AtlasSource.SpriteSource> sources, Executor executor) {
 		throw new AssertionError();
 	}
 

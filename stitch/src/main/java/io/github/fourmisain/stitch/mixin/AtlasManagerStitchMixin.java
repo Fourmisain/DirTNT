@@ -17,5 +17,6 @@ public abstract class AtlasManagerStitchMixin {
 	@Inject(method = "createSpriteMap", at = @At("HEAD"))
 	public void clearAnimationResourceMetadata(CallbackInfoReturnable<Map<SpriteIdentifier, Sprite>> cir) {
 		StitchImpl.animationResources.clear();
+		StitchImpl.textureResources.clear();
 	}
 }

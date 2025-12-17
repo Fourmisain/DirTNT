@@ -4,6 +4,7 @@ import io.github.fourmisain.stitch.impl.StitchImpl;
 import io.github.fourmisain.stitch.mixin.MissingSpriteAccessor;
 import io.github.fourmisain.stitch.mixin.SpriteContentsAccessor;
 import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
+import net.minecraft.client.resource.metadata.TextureResourceMetadata;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.SpriteContents;
 import net.minecraft.resource.metadata.ResourceMetadataSerializer;
@@ -39,6 +40,11 @@ public class Stitch {
 	/** note: returns null after stitching process is done */
 	public static Optional<AnimationResourceMetadata> getAnimationResourceMetadata(@NotNull SpriteContents sprite) {
 		return StitchImpl.animationResources.get(sprite);
+	}
+
+	/** note: returns null after stitching process is done */
+	public static Optional<TextureResourceMetadata> getTextureResourceMetadata(@NotNull SpriteContents sprite) {
+		return StitchImpl.textureResources.get(sprite);
 	}
 
 	public static List<ResourceMetadataSerializer.Value<?>> getAdditionalMetadata(@NotNull SpriteContents sprite) {
