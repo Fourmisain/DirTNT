@@ -3,7 +3,7 @@ package fourmisain.dirtnt;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.serialization.JsonOps;
-import fourmisain.dirtnt.client.DirtTntEntityRenderer;
+import fourmisain.dirtnt.client.DirtTntRenderer;
 import fourmisain.dirtnt.client.DirtTntSpriteRecipe;
 import io.github.fourmisain.stitch.api.Stitch;
 import net.fabricmc.api.ClientModInitializer;
@@ -35,7 +35,7 @@ public class DirTntClient implements ClientModInitializer {
 		});
 
 		for (Identifier dirtType : DIRT_TYPES) {
-			EntityRenderers.register(DirTnt.ENTITY_TYPE_MAP.get(dirtType), context -> new DirtTntEntityRenderer(dirtType, context));
+			EntityRenderers.register(DirTnt.ENTITY_TYPE_MAP.get(dirtType), context -> new DirtTntRenderer(dirtType, context));
 
 			Stitch.registerRecipe(new DirtTntSpriteRecipe(dirtType, "side"));
 			Stitch.registerRecipe(new DirtTntSpriteRecipe(dirtType, "top"));

@@ -19,9 +19,9 @@ import net.minecraft.resources.Identifier;
 public abstract class SpriteContentsMixin {
 	@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 	@Inject(method = "<init>(Lnet/minecraft/resources/Identifier;Lnet/minecraft/client/resources/metadata/animation/FrameSize;Lcom/mojang/blaze3d/platform/NativeImage;Ljava/util/Optional;Ljava/util/List;Ljava/util/Optional;)V", at = @At("RETURN"))
-	public void storeAnimationResourceMetadata(Identifier id, FrameSize dimensions, NativeImage image, Optional<AnimationMetadataSection> animationResourceMetadata, List<?> additionalMetadata, Optional<TextureMetadataSection> textureMetadata, CallbackInfo ci) {
+	public void storeAnimationResourceMetadata(Identifier id, FrameSize frameSize, NativeImage image, Optional<AnimationMetadataSection> animationMetadata, List<?> additionalMetadata, Optional<TextureMetadataSection> textureMetadata, CallbackInfo ci) {
 		var self = (SpriteContents) (Object) this;
-		StitchImpl.animationResources.put(self, animationResourceMetadata);
+		StitchImpl.animationResources.put(self, animationMetadata);
 		StitchImpl.textureResources.put(self, textureMetadata);
 	}
 }

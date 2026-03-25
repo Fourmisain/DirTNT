@@ -18,8 +18,8 @@ public class DirtTntBlock extends TntBlock {
 			.isRedstoneConductor(Blocks::never);
 	}
 
-	public DirtTntBlock(BlockBehaviour.Properties settings, Identifier dirtType) {
-		super(settings);
+	public DirtTntBlock(BlockBehaviour.Properties properties, Identifier dirtType) {
+		super(properties);
 		((Dirtable) this).makeDirty(dirtType);
 	}
 }

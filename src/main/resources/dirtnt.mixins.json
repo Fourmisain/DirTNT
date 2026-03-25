@@ -6,19 +6,19 @@
 	"mixins": [
 		"FireBlockAccessor",
 		"FireBlockMixin",
-		"FlintAndSteelDispenserBehaviorMixin",
-		"ReloadableRegistriesMixin",
-		"ServerRecipeManagerMixin",
-		"TagGroupLoaderMixin",
+		"FlintAndSteelDispenseItemBehaviorMixin",
+		"ReloadableServerRegistriesMixin",
+		"RecipeManagerMixin",
+		"TagLoaderMixin",
 		"TntBlockMixin",
     "PrimedTntMixin",
-		"WorldAccessor"
+		"LevelAccessor"
 	],
 	"client": [
-		"BakedModelManagerMixin",
-		"ItemAssetsLoaderMixin",
-		"TntEntityRendererMixin",
-		"TranslationStorageMixin"
+		"ModelManagerMixin",
+		"ClientItemInfoLoaderMixin",
+		"TntRendererMixin",
+		"ClientLanguageMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(Level.class)
-public interface WorldAccessor {
+public interface LevelAccessor {
 	@Accessor
 	static WeightedList<ExplosionParticleInfo> getDEFAULT_EXPLOSION_BLOCK_PARTICLES() {
 		throw new AssertionError();

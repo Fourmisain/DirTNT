@@ -2,7 +2,7 @@ package fourmisain.dirtnt.mixin;
 
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.Dirtable;
-import fourmisain.dirtnt.entity.DirtTntEntity;
+import fourmisain.dirtnt.entity.PrimedDirtTnt;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
@@ -56,22 +56,22 @@ public abstract class TntBlockMixin implements Dirtable {
 	}
 
 	@Inject(method = "prime(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At("HEAD"), cancellable = true)
-	private static void primeDirtTnt(Level world, BlockPos pos, LivingEntity igniter, CallbackInfoReturnable<Boolean> cir) {
-		if (DirTnt.dirtyOverride != null && !world.isClientSide()) {
-			DirtTntEntity tntEntity = new DirtTntEntity(DirTnt.dirtyOverride, world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
-			world.addFreshEntity(tntEntity);
-			world.playSound(null, tntEntity.getX(), tntEntity.getY(), tntEntity.getZ(), SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0F, 1.0F);
+	private static void primeDirtTnt(Level level, BlockPos pos, LivingEntity igniter, CallbackInfoReturnable<Boolean> cir) {
+		if (DirTnt.dirtyOverride != null && !level.isClientSide()) {
+			PrimedDirtTnt tnt = new PrimedDirtTnt(DirTnt.dirtyOverride, level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+			level.addFreshEntity(tnt);
+			level.playSound(null, tnt.getX(), tnt.getY(), tnt.getZ(), SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0F, 1.0F);
 			cir.setReturnValue(true);
 			cir.cancel();
 		}
 	}
 
 	@Inject(method = "wasExploded", at = @At("HEAD"), cancellable = true)
-	public void dirtTntDestroyedByExplosion(ServerLevel world, BlockPos pos, Explosion explosion, CallbackInfo ci) {
-		if (isDirty() && !world.isClientSide()) {
-			DirtTntEntity tntEntity = new DirtTntEntity(getDirtType(), world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
-			tntEntity.setFuse((short)(world.random.nextInt(tntEntity.getFuse() / 4) + tntEntity.getFuse() / 8));
-			world.addFreshEntity(tntEntity);
+	public void dirtTntDestroyedByExplosion(ServerLevel level, BlockPos pos, Explosion explosion, CallbackInfo ci) {
+		if (isDirty() && !level.isClientSide()) {
+			PrimedDirtTnt tnt = new PrimedDirtTnt(getDirtType(), level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+			tnt.setFuse((short)(level.random.nextInt(tnt.getFuse() / 4) + tnt.getFuse() / 8));
+			level.addFreshEntity(tnt);
 			ci.cancel();
 		}
 	}

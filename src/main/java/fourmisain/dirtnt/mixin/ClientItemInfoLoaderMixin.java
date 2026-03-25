@@ -25,7 +25,7 @@ import net.minecraft.server.packs.resources.Resource;
 import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 
 @Mixin(ClientItemInfoLoader.class)
-public abstract class ItemAssetsLoaderMixin {
+public abstract class ClientItemInfoLoaderMixin {
 	@Shadow @Final
 	private static FileToIdConverter LISTER;
 

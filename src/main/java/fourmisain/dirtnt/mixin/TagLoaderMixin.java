@@ -20,7 +20,7 @@ import net.minecraft.tags.TagLoader.EntryWithSource;
 import static fourmisain.dirtnt.DirTnt.*;
 
 @Mixin(TagLoader.class)
-public abstract class TagGroupLoaderMixin {
+public abstract class TagLoaderMixin {
 	@Shadow @Final
 	private String directory;
 

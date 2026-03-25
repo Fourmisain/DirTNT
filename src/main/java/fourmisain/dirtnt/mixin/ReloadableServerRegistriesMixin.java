@@ -26,9 +26,9 @@ import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 import static fourmisain.dirtnt.DirTnt.getDirtTntBlockId;
 
 @Mixin(ReloadableServerRegistries.class)
-public abstract class ReloadableRegistriesMixin {
+public abstract class ReloadableServerRegistriesMixin {
 	@Inject(
-		method = "method_61240", // prepare lambda
+		method = "method_61240", // scheduleRegistryLoad lambda
 		at = @At(
 			value = "INVOKE",
 			target = "Ljava/util/Map;forEach(Ljava/util/function/BiConsumer;)V"

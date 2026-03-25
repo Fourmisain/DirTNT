@@ -3,7 +3,7 @@ package fourmisain.dirtnt;
 import fourmisain.dirtnt.block.DirtTntBlock;
 import fourmisain.dirtnt.config.DirTntConfig;
 import fourmisain.dirtnt.config.GsonConfigHelper;
-import fourmisain.dirtnt.entity.DirtTntEntity;
+import fourmisain.dirtnt.entity.PrimedDirtTnt;
 import fourmisain.dirtnt.mixin.FireBlockAccessor;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -46,7 +46,7 @@ public class DirTnt implements ModInitializer {
 
 	public static final Map<Identifier, DirtTntBlock> BLOCK_MAP = new HashMap<>();
 	public static final Map<Identifier, Item> ITEM_MAP = new HashMap<>();
-	public static final Map<Identifier, EntityType<DirtTntEntity>> ENTITY_TYPE_MAP = new HashMap<>();
+	public static final Map<Identifier, EntityType<PrimedDirtTnt>> ENTITY_TYPE_MAP = new HashMap<>();
 
 	public static Identifier id(String id) {
 		return Identifier.fromNamespaceAndPath(MOD_ID, id);
@@ -121,18 +121,18 @@ public class DirTnt implements ModInitializer {
 	}
 
 	private static ItemStack dispenseDirtTnt(Identifier dirtType, BlockSource pointer, ItemStack stack) {
-		Level world = pointer.level();
+		Level level = pointer.level();
 		BlockPos pos = pointer.pos().relative(pointer.state().getValue(DispenserBlock.FACING));
-		DirtTntEntity tntEntity = new DirtTntEntity(dirtType, world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
-		world.addFreshEntity(tntEntity);
-		world.playSound(null, tntEntity.getX(), tntEntity.getY(), tntEntity.getZ(), SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0F, 1.0F);
-		world.gameEvent(null, GameEvent.ENTITY_PLACE, pos);
+		PrimedDirtTnt tnt = new PrimedDirtTnt(dirtType, level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+		level.addFreshEntity(tnt);
+		level.playSound(null, tnt.getX(), tnt.getY(), tnt.getZ(), SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0F, 1.0F);
+		level.gameEvent(null, GameEvent.ENTITY_PLACE, pos);
 		stack.shrink(1);
 		return stack;
 	}
 
-	private EntityType<DirtTntEntity> createDirtTntEntityType(Identifier dirtType, Identifier id) {
-		return EntityType.Builder.<DirtTntEntity>of((entityType, world) -> new DirtTntEntity(dirtType, entityType, world), MobCategory.MISC)
+	private EntityType<PrimedDirtTnt> createDirtTntEntityType(Identifier dirtType, Identifier id) {
+		return EntityType.Builder.<PrimedDirtTnt>of((entityType, level) -> new PrimedDirtTnt(dirtType, entityType, level), MobCategory.MISC)
 			.noLootTable()
 			.fireImmune()
 			.sized(0.98F, 0.98F)

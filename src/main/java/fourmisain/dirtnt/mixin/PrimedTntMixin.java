@@ -1,7 +1,7 @@
 package fourmisain.dirtnt.mixin;
 
 import fourmisain.dirtnt.Dirtable;
-import fourmisain.dirtnt.entity.DirtTntEntity;
+import fourmisain.dirtnt.entity.PrimedDirtTnt;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.item.PrimedTnt;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,7 +31,7 @@ public abstract class PrimedTntMixin implements Dirtable {
 		PrimedTnt self = (PrimedTnt) (Object) this;
 
 		if (isDirty()) {
-			DirtTntEntity.createDirtExplosion(getDirtType(), self, self.level());
+			PrimedDirtTnt.createDirtExplosion(getDirtType(), self, self.level());
 			ci.cancel();
 		}
 	}

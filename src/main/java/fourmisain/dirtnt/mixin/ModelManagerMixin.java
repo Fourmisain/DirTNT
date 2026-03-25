@@ -19,7 +19,7 @@ import static fourmisain.dirtnt.DirTntClient.getCubeBottomTopBlockModelJson;
 
 // replacement for pluginContext.addModels() + pluginContext.modifyModelOnLoad()
 @Mixin(ModelManager.class)
-public abstract class BakedModelManagerMixin {
+public abstract class ModelManagerMixin {
 	@ModifyExpressionValue(
 		method = "loadBlockModels",
 		at = @At(

@@ -32,7 +32,7 @@ import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 import static fourmisain.dirtnt.DirTnt.getDirtTntBlockId;
 
 @Mixin(RecipeManager.class)
-public abstract class ServerRecipeManagerMixin {
+public abstract class RecipeManagerMixin {
 	@Shadow @Final
 	private HolderLookup.Provider registries;
 

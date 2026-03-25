@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 /** Allow TNT renderer to be dirty */
 @Mixin(TntRenderer.class)
-public abstract class TntEntityRendererMixin implements Dirtable {
+public abstract class TntRendererMixin implements Dirtable {
 	@Unique
 	private Identifier dirtType = null;
 

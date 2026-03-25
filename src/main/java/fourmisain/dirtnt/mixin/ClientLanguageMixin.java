@@ -3,7 +3,7 @@ package fourmisain.dirtnt.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.block.DirtTntBlock;
-import fourmisain.dirtnt.entity.DirtTntEntity;
+import fourmisain.dirtnt.entity.PrimedDirtTnt;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.Block;
 import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 
 @Mixin(ClientLanguage.class)
-public abstract class TranslationStorageMixin {
+public abstract class ClientLanguageMixin {
 	@Inject(
 		method = "loadFrom(Lnet/minecraft/server/packs/resources/ResourceManager;Ljava/util/List;Z)Lnet/minecraft/client/resources/language/ClientLanguage;",
 		at = @At(
@@ -37,7 +37,7 @@ public abstract class TranslationStorageMixin {
 			if (block.isEmpty()) continue;
 
 			DirtTntBlock tntBlock = DirTnt.BLOCK_MAP.get(dirtType);
-			EntityType<DirtTntEntity> tntEntity = DirTnt.ENTITY_TYPE_MAP.get(dirtType);
+			EntityType<PrimedDirtTnt> tntEntity = DirTnt.ENTITY_TYPE_MAP.get(dirtType);
 
 			// auto-gen translations
 			String name = translations.get(block.get().getDescriptionId()) + " TNT";

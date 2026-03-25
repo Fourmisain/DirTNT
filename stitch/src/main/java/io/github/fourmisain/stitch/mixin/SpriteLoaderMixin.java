@@ -35,19 +35,19 @@ public abstract class SpriteLoaderMixin {
 		)
 	)
 	public CompletableFuture<List<SpriteContents>> addStitchSteps(CompletableFuture<List<SpriteContents>> original,
-			@Local(argsOnly = true) ResourceManager resourceManager, @Local(argsOnly = true) Identifier atlasId, @Local(argsOnly = true) Executor executor, @Local SpriteResourceLoader spriteOpener) {
-		return stitch$stitchSteps(resourceManager, atlasId, executor, original, spriteOpener);
+			@Local(argsOnly = true) ResourceManager resourceManager, @Local(argsOnly = true) Identifier atlasId, @Local(argsOnly = true) Executor executor, @Local SpriteResourceLoader spriteLoader) {
+		return stitch$stitchSteps(resourceManager, atlasId, executor, original, spriteLoader);
 	}
 
 	@Unique
-	private static CompletableFuture<List<SpriteContents>> stitch$stitchSteps(ResourceManager resourceManager, Identifier atlasId, Executor executor, CompletableFuture<List<SpriteContents>> future, SpriteResourceLoader spriteOpener) {
+	private static CompletableFuture<List<SpriteContents>> stitch$stitchSteps(ResourceManager resourceManager, Identifier atlasId, Executor executor, CompletableFuture<List<SpriteContents>> future, SpriteResourceLoader spriteLoader) {
 		return future.thenApply(list -> StitchImpl.prepareGenerating(list, atlasId, resourceManager))
 			.thenCompose(stage -> {
 				if (stage.generators().isEmpty()) {
 					return CompletableFuture.completedFuture(stage.current());
 				} else {
 					// start generating sprites, returning the merged list when done
-					return runSpriteSuppliers(spriteOpener, stage.generators(), executor)
+					return runSpriteSuppliers(spriteLoader, stage.generators(), executor)
 						.thenApply(list -> ImmutableList.<SpriteContents>builder()
 							.addAll(stage.current())
 							.addAll(list)

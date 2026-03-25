@@ -3,9 +3,10 @@ package fourmisain.dirtnt.entity;
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.Dirtable;
 import fourmisain.dirtnt.block.DirtTntBlock;
-import fourmisain.dirtnt.mixin.WorldAccessor;
+import fourmisain.dirtnt.mixin.LevelAccessor;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundExplodePacket;
@@ -26,18 +27,18 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class DirtTntEntity extends PrimedTnt {
+public class PrimedDirtTnt extends PrimedTnt {
 	public static final int RADIUS = 3;
 
-	public DirtTntEntity(Identifier dirtType, EntityType<? extends PrimedTnt> entityType, Level world) {
-		super(entityType, world);
+	public PrimedDirtTnt(Identifier dirtType, EntityType<? extends PrimedTnt> entityType, Level level) {
+		super(entityType, level);
 		((Dirtable) this).makeDirty(dirtType);
 	}
 
-	public DirtTntEntity(Identifier dirtType, Level world, double x, double y, double z) {
-		this(dirtType, DirTnt.ENTITY_TYPE_MAP.get(dirtType), world);
+	public PrimedDirtTnt(Identifier dirtType, Level level, double x, double y, double z) {
+		this(dirtType, DirTnt.ENTITY_TYPE_MAP.get(dirtType), level);
 		this.setPos(x, y, z);
-		double angle = world.random.nextDouble() * 2*Math.PI;
+		double angle = level.random.nextDouble() * 2*Math.PI;
 		this.setDeltaMovement(-Math.sin(angle) * 0.02, 0.2, -Math.cos(angle) * 0.02);
 		this.setFuse(80);
 		this.xo = x;
@@ -45,17 +46,17 @@ public class DirtTntEntity extends PrimedTnt {
 		this.zo = z;
 	}
 
-	public static void createDirtExplosion(Identifier dirtType, Entity entity, Level world) {
-		if (world.isClientSide()) return;
+	public static void createDirtExplosion(Identifier dirtType, Entity entity, Level level) {
+		if (level.isClientSide()) return;
 
 		// emitGameEvent seems to mainly be used for the Sculk Sensor
-		world.gameEvent(entity, GameEvent.EXPLODE, new Vec3(entity.getX(), entity.getY(), entity.getZ()));
+		level.gameEvent(entity, GameEvent.EXPLODE, new Vec3(entity.getX(), entity.getY(), entity.getZ()));
 
 		// center explosion at the entity
 		BlockPos centerBlockPos = entity.blockPosition();
 		Vec3 centerVec = entity.getBoundingBox().getCenter();
 
-		BlockPos.MutableBlockPos targetBlockPos = new BlockPos.MutableBlockPos();
+		MutableBlockPos targetBlockPos = new MutableBlockPos();
 
 		Optional<Block> maybeDirtBlock = BuiltInRegistries.BLOCK.getOptional(dirtType);
 		if (maybeDirtBlock.isEmpty()) throw new AssertionError("Dirt TNT entity exists but block is not registered!");
@@ -77,24 +78,24 @@ public class DirtTntEntity extends PrimedTnt {
 
 						// walk through all blocks from the explosion center to the target block
 						BlockGetter.traverseBlocks(context.getFrom(), context.getTo(), context, (ctx, pos) -> {
-							BlockState state = world.getBlockState(pos);
+							BlockState state = level.getBlockState(pos);
 
 							// skip over/trace through dirt
 							if (state.is(dirtBlock)) {
 								return null;
 							}
 
-							igniteDirtTnt(world, pos);
+							igniteDirtTnt(level, pos);
 
 							// test the block's shape for a collision
-							VoxelShape blockShape = ctx.getBlockShape(state, world, pos);
-							BlockHitResult hitResult = world.clipWithInteractionOverride(ctx.getFrom(), ctx.getTo(), pos, blockShape, state);
+							VoxelShape blockShape = ctx.getBlockShape(state, level, pos);
+							BlockHitResult hitResult = level.clipWithInteractionOverride(ctx.getFrom(), ctx.getTo(), pos, blockShape, state);
 
 							// if nothing was hit
 							if (hitResult == null) {
 								// place dirt if possible
 								if (state.canBeReplaced()) {
-									world.setBlockAndUpdate(pos, dirtBlock.defaultBlockState());
+									level.setBlockAndUpdate(pos, dirtBlock.defaultBlockState());
 									blockCount[0]++;
 								}
 
@@ -110,24 +111,24 @@ public class DirtTntEntity extends PrimedTnt {
 			}
 		}
 
-		for (var player : ((ServerLevel) world).players()) {
+		for (var player : ((ServerLevel) level).players()) {
 			if (player.distanceToSqr(centerVec) < 64 * 64) {
 				player.connection.send(new ClientboundExplodePacket(centerVec, RADIUS + 1, blockCount[0], Optional.empty(),
-					ParticleTypes.EXPLOSION, SoundEvents.GENERIC_EXPLODE, WorldAccessor.getDEFAULT_EXPLOSION_BLOCK_PARTICLES()));
+					ParticleTypes.EXPLOSION, SoundEvents.GENERIC_EXPLODE, LevelAccessor.getDEFAULT_EXPLOSION_BLOCK_PARTICLES()));
 			}
 		}
 	}
 
-	public static void igniteDirtTnt(Level world, BlockPos pos) {
-		if (world.getBlockState(pos).getBlock() instanceof DirtTntBlock dirtTntBlock) {
+	public static void igniteDirtTnt(Level level, BlockPos pos) {
+		if (level.getBlockState(pos).getBlock() instanceof DirtTntBlock dirtTntBlock) {
 			Identifier dirtType = ((Dirtable) dirtTntBlock).getDirtType();
 
-			world.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+			level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
 
-			PrimedTnt tnt = new DirtTntEntity(dirtType, world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+			PrimedTnt tnt = new PrimedDirtTnt(dirtType, level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
 			int t = tnt.getFuse();
-			tnt.setFuse(world.random.nextInt(t / 4) + t / 8);
-			world.addFreshEntity(tnt);
+			tnt.setFuse(level.random.nextInt(t / 4) + t / 8);
+			level.addFreshEntity(tnt);
 		}
 	}
 }
