@@ -4,11 +4,6 @@ import com.mojang.blaze3d.platform.NativeImage;
 import fourmisain.dirtnt.DirTnt;
 import io.github.fourmisain.stitch.api.SpriteRecipe;
 import io.github.fourmisain.stitch.api.Stitch;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.animation.FrameSize;
@@ -17,6 +12,12 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.metadata.MetadataSectionType;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class DirtTntSpriteRecipe implements SpriteRecipe {

@@ -70,7 +70,7 @@ public abstract class TntBlockMixin implements Dirtable {
 	public void dirtTntDestroyedByExplosion(ServerLevel level, BlockPos pos, Explosion explosion, CallbackInfo ci) {
 		if (isDirty() && !level.isClientSide()) {
 			PrimedDirtTnt tnt = new PrimedDirtTnt(getDirtType(), level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
-			tnt.setFuse((short)(level.random.nextInt(tnt.getFuse() / 4) + tnt.getFuse() / 8));
+			tnt.setFuse((short)(level.getRandom().nextInt(tnt.getFuse() / 4) + tnt.getFuse() / 8));
 			level.addFreshEntity(tnt);
 			ci.cancel();
 		}

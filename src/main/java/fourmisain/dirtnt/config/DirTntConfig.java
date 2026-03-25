@@ -1,8 +1,9 @@
 package fourmisain.dirtnt.config;
 
 import com.google.common.collect.ImmutableSet;
-import java.util.Set;
 import net.minecraft.resources.Identifier;
+
+import java.util.Set;
 
 public class DirTntConfig {
 

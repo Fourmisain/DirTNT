@@ -5,8 +5,9 @@ import fourmisain.dirtnt.config.DirTntConfig;
 import fourmisain.dirtnt.config.GsonConfigHelper;
 import fourmisain.dirtnt.entity.PrimedDirtTnt;
 import fourmisain.dirtnt.mixin.FireBlockAccessor;
+import fourmisain.dirtnt.mixin.ItemsAccessor;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.dispenser.BlockSource;
@@ -21,7 +22,6 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DispenserBlock;
@@ -102,7 +102,7 @@ public class DirTnt implements ModInitializer {
 			// register dirt tnt
 			var block = Registry.register(BuiltInRegistries.BLOCK, id,
 				new DirtTntBlock(DirtTntBlock.getDefaultProperties().setId(ResourceKey.create(Registries.BLOCK, id)), dirtType));
-			var item = Items.registerBlock(block, new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id)));
+			var item = ItemsAccessor.invokeRegisterBlock(block, new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id)));
 			var entityType = Registry.register(BuiltInRegistries.ENTITY_TYPE, id, createDirtTntEntityType(dirtType, id));
 			BLOCK_MAP.put(dirtType, block);
 			ITEM_MAP.put(dirtType, item);
@@ -113,7 +113,7 @@ public class DirTnt implements ModInitializer {
 			fireBlock.invokeSetFlammable(block, 15, 100);
 		}
 
-		ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(entries -> {
+		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(entries -> {
 			for (Identifier dirtType : DIRT_TYPES) {
 				entries.accept(ITEM_MAP.get(dirtType));
 			}

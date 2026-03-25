@@ -4,7 +4,6 @@ import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.Dirtable;
 import fourmisain.dirtnt.block.DirtTntBlock;
 import fourmisain.dirtnt.mixin.LevelAccessor;
-import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -27,6 +26,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import java.util.Optional;
+
 public class PrimedDirtTnt extends PrimedTnt {
 	public static final int RADIUS = 3;
 
@@ -38,7 +39,7 @@ public class PrimedDirtTnt extends PrimedTnt {
 	public PrimedDirtTnt(Identifier dirtType, Level level, double x, double y, double z) {
 		this(dirtType, DirTnt.ENTITY_TYPE_MAP.get(dirtType), level);
 		this.setPos(x, y, z);
-		double angle = level.random.nextDouble() * 2*Math.PI;
+		double angle = level.getRandom().nextDouble() * 2*Math.PI;
 		this.setDeltaMovement(-Math.sin(angle) * 0.02, 0.2, -Math.cos(angle) * 0.02);
 		this.setFuse(80);
 		this.xo = x;
@@ -127,7 +128,7 @@ public class PrimedDirtTnt extends PrimedTnt {
 
 			PrimedTnt tnt = new PrimedDirtTnt(dirtType, level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
 			int t = tnt.getFuse();
-			tnt.setFuse(level.random.nextInt(t / 4) + t / 8);
+			tnt.setFuse(level.getRandom().nextInt(t / 4) + t / 8);
 			level.addFreshEntity(tnt);
 		}
 	}

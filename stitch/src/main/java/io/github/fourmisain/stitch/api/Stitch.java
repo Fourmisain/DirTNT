@@ -4,17 +4,17 @@ import com.mojang.blaze3d.platform.NativeImage;
 import io.github.fourmisain.stitch.impl.StitchImpl;
 import io.github.fourmisain.stitch.mixin.MissingSpriteAccessor;
 import io.github.fourmisain.stitch.mixin.SpriteContentsAccessor;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Optional;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.metadata.MetadataSectionType;
 import net.minecraft.util.ARGB;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Optional;
 
 public class Stitch {
 	private Stitch() {}

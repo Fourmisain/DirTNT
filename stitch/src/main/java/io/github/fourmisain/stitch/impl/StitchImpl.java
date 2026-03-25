@@ -1,22 +1,20 @@
 package io.github.fourmisain.stitch.impl;
 
 import io.github.fourmisain.stitch.api.SpriteRecipe;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /*
  * 1.21.11 added TextureResourceMetadata to SpriteContents
- *
- * TODO transparent blocks are rendering weirdly (before they just had a black background), no idea what's causing this
  *
  * Note that this version of Stitch currently does not deal with recursive dependencies, it only does a single generation pass.
  */

@@ -1,9 +1,6 @@
 package io.github.fourmisain.stitch.api;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.animation.FrameSize;
@@ -11,6 +8,10 @@ import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.metadata.MetadataSectionType;
 import net.minecraft.server.packs.resources.ResourceManager;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /** An instruction of how a sprite is crafted from other sprite dependencies */
 public interface SpriteRecipe {

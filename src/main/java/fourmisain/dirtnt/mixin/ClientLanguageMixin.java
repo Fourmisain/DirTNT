@@ -4,6 +4,12 @@ import com.llamalad7.mixinextras.sugar.Local;
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.block.DirtTntBlock;
 import fourmisain.dirtnt.entity.PrimedDirtTnt;
+import net.minecraft.client.resources.language.ClientLanguage;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -12,12 +18,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.client.resources.language.ClientLanguage;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.level.block.Block;
 
 import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 

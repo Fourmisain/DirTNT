@@ -1,5 +1,11 @@
 package fourmisain.dirtnt.mixin;
 
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagEntry;
+import net.minecraft.tags.TagLoader;
+import net.minecraft.tags.TagLoader.EntryWithSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -10,12 +16,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.TagEntry;
-import net.minecraft.tags.TagLoader;
-import net.minecraft.tags.TagLoader.EntryWithSource;
 
 import static fourmisain.dirtnt.DirTnt.*;
 

@@ -5,6 +5,11 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.serialization.JsonOps;
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.DirTntClient;
+import net.minecraft.client.renderer.item.ClientItem;
+import net.minecraft.client.resources.model.ClientItemInfoLoader;
+import net.minecraft.resources.FileToIdConverter;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.Resource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,11 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import net.minecraft.client.renderer.item.ClientItem;
-import net.minecraft.client.resources.model.ClientItemInfoLoader;
-import net.minecraft.resources.FileToIdConverter;
-import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.resources.Resource;
 
 import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 
@@ -30,7 +30,7 @@ public abstract class ClientItemInfoLoaderMixin {
 	private static FileToIdConverter LISTER;
 
 	@ModifyArg(
-		method = "method_65932", // load forEach supplyAsync lambda
+		method = "lambda$scheduleLoad$1", // scheduleLoad forEach supplyAsync lambda
 		at = @At(
 			value = "INVOKE",
 			target = "Lnet/minecraft/util/Util;sequence(Ljava/util/List;)Ljava/util/concurrent/CompletableFuture;"

@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * since the FLINT_AND_STEEL DispenserBehavior removes the block *after* priming the TNT.
  * This is a tad more efficient though.
  */
-@Mixin(targets = "net.minecraft.core.dispenser.DispenseItemBehavior$6")
+@Mixin(targets = "net.minecraft.core.dispenser.DispenseItemBehavior$5")
 public abstract class FlintAndSteelDispenseItemBehaviorMixin {
 	@Inject(
 		method = "execute",

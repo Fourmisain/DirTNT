@@ -8,7 +8,7 @@ import fourmisain.dirtnt.client.DirtTntSpriteRecipe;
 import io.github.fourmisain.stitch.api.Stitch;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
-import net.minecraft.client.renderer.block.model.BlockModelDefinition;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
@@ -25,7 +25,7 @@ public class DirTntClient implements ClientModInitializer {
 
 				pluginContext.registerBlockStateResolver(DirTnt.BLOCK_MAP.get(dirtType), context -> {
 					JsonObject jsonElement = GsonHelper.parse(getBlockStatesJson(blockModelId));
-					var modelDefinition = BlockModelDefinition.CODEC.parse(JsonOps.INSTANCE, jsonElement).getOrThrow(JsonParseException::new);
+					var modelDefinition = BlockStateModelDispatcher.CODEC.parse(JsonOps.INSTANCE, jsonElement).getOrThrow(JsonParseException::new);
 
 					modelDefinition.simpleModels().ifPresent(modelVariants -> {
 						modelVariants.instantiate(context.block().getStateDefinition(), () -> blockId + "/" + DirTnt.MOD_ID, context::setModel);

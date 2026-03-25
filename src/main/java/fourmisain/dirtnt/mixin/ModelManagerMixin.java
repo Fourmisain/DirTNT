@@ -3,16 +3,16 @@ package fourmisain.dirtnt.mixin;
 import com.google.common.collect.ImmutableMap;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import fourmisain.dirtnt.DirTnt;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.client.resources.model.cuboid.CuboidModel;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 import java.io.StringReader;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.resources.model.ModelManager;
-import net.minecraft.client.resources.model.UnbakedModel;
-import net.minecraft.resources.Identifier;
 
 import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 import static fourmisain.dirtnt.DirTntClient.getCubeBottomTopBlockModelJson;
@@ -36,7 +36,7 @@ public abstract class ModelManagerMixin {
 				for (var dirtType : DIRT_TYPES) {
 					Identifier blockModelId = DirTnt.getDirtTntBlockId(dirtType).withPrefix("block/");
 
-					BlockModel model = BlockModel.fromStream(new StringReader(getCubeBottomTopBlockModelJson(blockModelId)));
+					var model = CuboidModel.fromStream(new StringReader(getCubeBottomTopBlockModelJson(blockModelId)));
 
 					if (!unbakedModels.containsKey(blockModelId)) {
 						builder.put(blockModelId, model);

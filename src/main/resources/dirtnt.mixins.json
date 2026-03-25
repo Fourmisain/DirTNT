@@ -7,18 +7,19 @@
 		"FireBlockAccessor",
 		"FireBlockMixin",
 		"FlintAndSteelDispenseItemBehaviorMixin",
-		"ReloadableServerRegistriesMixin",
+		"ItemsAccessor",
+		"LevelAccessor",
+		"PrimedTntMixin",
 		"RecipeManagerMixin",
+		"ReloadableServerRegistriesMixin",
 		"TagLoaderMixin",
-		"TntBlockMixin",
-    "PrimedTntMixin",
-		"LevelAccessor"
+		"TntBlockMixin"
 	],
 	"client": [
-		"ModelManagerMixin",
 		"ClientItemInfoLoaderMixin",
-		"TntRendererMixin",
-		"ClientLanguageMixin"
+		"ClientLanguageMixin",
+		"ModelManagerMixin",
+		"TntRendererMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
