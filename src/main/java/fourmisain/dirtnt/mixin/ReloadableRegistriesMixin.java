@@ -5,13 +5,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.llamalad7.mixinextras.sugar.Local;
 import fourmisain.dirtnt.DirTnt;
-import net.minecraft.loot.LootDataType;
-import net.minecraft.registry.MutableRegistry;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryOps;
-import net.minecraft.registry.ReloadableRegistries;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,11 +14,18 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Map;
+import net.minecraft.core.WritableRegistry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.RegistryOps;
+import net.minecraft.server.ReloadableServerRegistries;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.level.storage.loot.LootDataType;
 
 import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 import static fourmisain.dirtnt.DirTnt.getDirtTntBlockId;
 
-@Mixin(ReloadableRegistries.class)
+@Mixin(ReloadableServerRegistries.class)
 public abstract class ReloadableRegistriesMixin {
 	@Inject(
 		method = "method_61240", // prepare lambda
@@ -34,9 +34,9 @@ public abstract class ReloadableRegistriesMixin {
 			target = "Ljava/util/Map;forEach(Ljava/util/function/BiConsumer;)V"
 		)
 	)
-	private static <T> void addDirTntLootTables(LootDataType<T> type, ResourceManager resourceManager, RegistryOps<JsonElement> ops, CallbackInfoReturnable<MutableRegistry<?>> cir,
+	private static <T> void addDirTntLootTables(LootDataType<T> type, ResourceManager resourceManager, RegistryOps<JsonElement> ops, CallbackInfoReturnable<WritableRegistry<?>> cir,
 			@Local Map<Identifier, T> lootTables) {
-		if (!type.registryKey().equals(RegistryKeys.LOOT_TABLE))
+		if (!type.registryKey().equals(Registries.LOOT_TABLE))
 			return;
 
 		for (Identifier dirtType : DIRT_TYPES) {

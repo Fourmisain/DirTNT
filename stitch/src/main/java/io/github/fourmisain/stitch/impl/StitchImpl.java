@@ -1,17 +1,17 @@
 package io.github.fourmisain.stitch.impl;
 
 import io.github.fourmisain.stitch.api.SpriteRecipe;
-import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
-import net.minecraft.client.resource.metadata.TextureResourceMetadata;
-import net.minecraft.client.texture.SpriteContents;
-import net.minecraft.client.texture.atlas.AtlasSource;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import net.minecraft.client.renderer.texture.SpriteContents;
+import net.minecraft.client.renderer.texture.atlas.SpriteSource;
+import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
+import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.resources.ResourceManager;
 
 /*
  * 1.21.11 added TextureResourceMetadata to SpriteContents
@@ -27,10 +27,10 @@ public class StitchImpl {
 	/** atlas id -> sprite id -> recipe */
 	public static final Map<Identifier, Map<Identifier, SpriteRecipe>> atlasRecipes = new LinkedHashMap<>();
 
-	public static final Map<SpriteContents, Optional<AnimationResourceMetadata>> animationResources = new ConcurrentHashMap<>();
-	public static final Map<SpriteContents, Optional<TextureResourceMetadata>> textureResources = new ConcurrentHashMap<>();
+	public static final Map<SpriteContents, Optional<AnimationMetadataSection>> animationResources = new ConcurrentHashMap<>();
+	public static final Map<SpriteContents, Optional<TextureMetadataSection>> textureResources = new ConcurrentHashMap<>();
 
-	public record SpritesStage(List<SpriteContents> current, List<AtlasSource.SpriteSource> generators) {}
+	public record SpritesStage(List<SpriteContents> current, List<SpriteSource.Loader> generators) {}
 
 	public static SpritesStage prepareGenerating(List<SpriteContents> sprites, Identifier atlasId, ResourceManager resourceManager) {
 		Map<Identifier, SpriteRecipe> recipeMap = StitchImpl.atlasRecipes.getOrDefault(atlasId, Map.of());
@@ -38,13 +38,13 @@ public class StitchImpl {
 		// distribute sprite data
 		for (SpriteContents sprite : sprites) {
 			for (SpriteRecipe recipe : recipeMap.values()) {
-				if (recipe.getDependencies().contains(sprite.getId())) {
+				if (recipe.getDependencies().contains(sprite.name())) {
 					recipe.collectSprite(sprite);
 				}
 			}
 		}
 
-		List<AtlasSource.SpriteSource> generators = new ArrayList<>();
+		List<SpriteSource.Loader> generators = new ArrayList<>();
 
 		for (var entry : recipeMap.entrySet()) {
 			Identifier id = entry.getKey();

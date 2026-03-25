@@ -1,14 +1,14 @@
 package io.github.fourmisain.stitch.mixin;
 
-import net.minecraft.client.texture.MissingSprite;
-import net.minecraft.client.texture.NativeImage;
+import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(MissingSprite.class)
+@Mixin(MissingTextureAtlasSprite.class)
 public interface MissingSpriteAccessor {
 	@Invoker
-	static NativeImage invokeCreateImage(int width, int height) {
+	static NativeImage invokeGenerateMissingImage(int width, int height) {
 		throw new AssertionError();
 	}
 }

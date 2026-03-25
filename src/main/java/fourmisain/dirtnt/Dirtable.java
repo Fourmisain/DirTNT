@@ -1,6 +1,6 @@
 package fourmisain.dirtnt;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public interface Dirtable {
 	void makeDirty(Identifier dirtType);

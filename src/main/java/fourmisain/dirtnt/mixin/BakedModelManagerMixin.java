@@ -3,25 +3,25 @@ package fourmisain.dirtnt.mixin;
 import com.google.common.collect.ImmutableMap;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import fourmisain.dirtnt.DirTnt;
-import net.minecraft.client.render.model.BakedModelManager;
-import net.minecraft.client.render.model.UnbakedModel;
-import net.minecraft.client.render.model.json.JsonUnbakedModel;
-import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 import java.io.StringReader;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.resources.Identifier;
 
 import static fourmisain.dirtnt.DirTnt.DIRT_TYPES;
 import static fourmisain.dirtnt.DirTntClient.getCubeBottomTopBlockModelJson;
 
 // replacement for pluginContext.addModels() + pluginContext.modifyModelOnLoad()
-@Mixin(BakedModelManager.class)
+@Mixin(ModelManager.class)
 public abstract class BakedModelManagerMixin {
 	@ModifyExpressionValue(
-		method = "reloadModels",
+		method = "loadBlockModels",
 		at = @At(
 			value = "INVOKE",
 			target = "Ljava/util/concurrent/CompletableFuture;thenCompose(Ljava/util/function/Function;)Ljava/util/concurrent/CompletableFuture;"
@@ -34,9 +34,9 @@ public abstract class BakedModelManagerMixin {
 					.putAll(unbakedModels);
 
 				for (var dirtType : DIRT_TYPES) {
-					Identifier blockModelId = DirTnt.getDirtTntBlockId(dirtType).withPrefixedPath("block/");
+					Identifier blockModelId = DirTnt.getDirtTntBlockId(dirtType).withPrefix("block/");
 
-					JsonUnbakedModel model = JsonUnbakedModel.deserialize(new StringReader(getCubeBottomTopBlockModelJson(blockModelId)));
+					BlockModel model = BlockModel.fromStream(new StringReader(getCubeBottomTopBlockModelJson(blockModelId)));
 
 					if (!unbakedModels.containsKey(blockModelId)) {
 						builder.put(blockModelId, model);

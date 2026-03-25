@@ -1,17 +1,16 @@
 package io.github.fourmisain.stitch.mixin;
 
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.SpriteContents;
-import net.minecraft.resource.metadata.ResourceMetadataSerializer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
-
+import com.mojang.blaze3d.platform.NativeImage;
 import java.util.List;
+import net.minecraft.client.renderer.texture.SpriteContents;
+import net.minecraft.server.packs.metadata.MetadataSectionType;
 
 @Mixin(SpriteContents.class)
 public interface SpriteContentsAccessor {
 	@Accessor
-	NativeImage getImage();
+	NativeImage getOriginalImage();
 	@Accessor
-	List<ResourceMetadataSerializer.Value<?>> getAdditionalMetadata();
+	List<MetadataSectionType.WithValue<?>> getAdditionalMetadata();
 }

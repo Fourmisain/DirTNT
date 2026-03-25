@@ -1,17 +1,16 @@
 package io.github.fourmisain.stitch.api;
 
-import net.minecraft.client.resource.metadata.AnimationResourceMetadata;
-import net.minecraft.client.resource.metadata.TextureResourceMetadata;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.SpriteContents;
-import net.minecraft.client.texture.SpriteDimensions;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.metadata.ResourceMetadataSerializer;
-import net.minecraft.util.Identifier;
-
+import com.mojang.blaze3d.platform.NativeImage;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import net.minecraft.client.renderer.texture.SpriteContents;
+import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
+import net.minecraft.client.resources.metadata.animation.FrameSize;
+import net.minecraft.client.resources.metadata.texture.TextureMetadataSection;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.metadata.MetadataSectionType;
+import net.minecraft.server.packs.resources.ResourceManager;
 
 /** An instruction of how a sprite is crafted from other sprite dependencies */
 public interface SpriteRecipe {
@@ -30,7 +29,7 @@ public interface SpriteRecipe {
 	 *   minecraft:particles
 	 */
 	default Identifier getAtlasId() {
-		return Identifier.ofVanilla("blocks"); // corresponds to BLOCK_ATLAS_TEXTURE
+		return Identifier.withDefaultNamespace("blocks"); // corresponds to BLOCK_ATLAS_TEXTURE
 	}
 
 	/** Which sprites this recipe depends on. */
@@ -42,13 +41,13 @@ public interface SpriteRecipe {
 	/** Called for each sprite dependency, if it exists. */
 	void collectSprite(SpriteContents spriteContents);
 
-	SpriteDimensions generateSize();
+	FrameSize generateSize();
 
-	Optional<AnimationResourceMetadata> generateAnimationResourceMetadata();
+	Optional<AnimationMetadataSection> generateAnimationResourceMetadata();
 
-	Optional<TextureResourceMetadata> generateTextureResourceMetadata();
+	Optional<TextureMetadataSection> generateTextureResourceMetadata();
 
-	List<ResourceMetadataSerializer.Value<?>> generateAdditionalMetadata();
+	List<MetadataSectionType.WithValue<?>> generateAdditionalMetadata();
 
 	NativeImage generateImage(ResourceManager resourceManager);
 }
