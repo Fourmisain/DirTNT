@@ -47,7 +47,7 @@ public class PrimedDirtTnt extends PrimedTnt {
 		this.zo = z;
 	}
 
-	public static void createDirtExplosion(Identifier dirtType, Entity entity, Level level) {
+	public static void createDirtExplosion(Identifier dirtType, Entity entity, Level level, boolean doExplode) {
 		if (level.isClientSide()) return;
 
 		// emitGameEvent seems to mainly be used for the Sculk Sensor
@@ -66,47 +66,49 @@ public class PrimedDirtTnt extends PrimedTnt {
 
 		int[] blockCount = new int[1];
 
-		// for every 'target' block within a distance of RADIUS
-		for (int x = -RADIUS; x <= RADIUS; x++) {
-			for (int y = -RADIUS; y <= RADIUS; y++) {
-				for (int z = -RADIUS; z <= RADIUS; z++) {
-					targetBlockPos.set(centerVec.x + x, centerVec.y + y, centerVec.z + z);
-					Vec3 targetVec = Vec3.atCenterOf(targetBlockPos);
+		if (doExplode) {
+			// for every 'target' block within a distance of RADIUS
+			for (int x = -RADIUS; x <= RADIUS; x++) {
+				for (int y = -RADIUS; y <= RADIUS; y++) {
+					for (int z = -RADIUS; z <= RADIUS; z++) {
+						targetBlockPos.set(centerVec.x + x, centerVec.y + y, centerVec.z + z);
+						Vec3 targetVec = Vec3.atCenterOf(targetBlockPos);
 
-					if (targetBlockPos.closerThan(centerBlockPos, RADIUS + 1)) {
-						ClipContext context = new ClipContext(centerVec, targetVec,
-							ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity);
+						if (targetBlockPos.closerThan(centerBlockPos, RADIUS + 1)) {
+							ClipContext context = new ClipContext(centerVec, targetVec,
+								ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity);
 
-						// walk through all blocks from the explosion center to the target block
-						BlockGetter.traverseBlocks(context.getFrom(), context.getTo(), context, (ctx, pos) -> {
-							BlockState state = level.getBlockState(pos);
+							// walk through all blocks from the explosion center to the target block
+							BlockGetter.traverseBlocks(context.getFrom(), context.getTo(), context, (ctx, pos) -> {
+								BlockState state = level.getBlockState(pos);
 
-							// skip over/trace through dirt
-							if (state.is(dirtBlock)) {
-								return null;
-							}
-
-							igniteDirtTnt(level, pos);
-
-							// test the block's shape for a collision
-							VoxelShape blockShape = ctx.getBlockShape(state, level, pos);
-							BlockHitResult hitResult = level.clipWithInteractionOverride(ctx.getFrom(), ctx.getTo(), pos, blockShape, state);
-
-							// if nothing was hit
-							if (hitResult == null) {
-								// place dirt if possible
-								if (state.canBeReplaced()) {
-									level.setBlockAndUpdate(pos, dirtBlock.defaultBlockState());
-									blockCount[0]++;
+								// skip over/trace through dirt
+								if (state.is(dirtBlock)) {
+									return null;
 								}
 
-								// and continue
-								return null;
-							}
+								igniteDirtTnt(level, pos);
 
-							// else abort
-							return state;
-						}, (ctx) -> null);
+								// test the block's shape for a collision
+								VoxelShape blockShape = ctx.getBlockShape(state, level, pos);
+								BlockHitResult hitResult = level.clipWithInteractionOverride(ctx.getFrom(), ctx.getTo(), pos, blockShape, state);
+
+								// if nothing was hit
+								if (hitResult == null) {
+									// place dirt if possible
+									if (state.canBeReplaced()) {
+										level.setBlockAndUpdate(pos, dirtBlock.defaultBlockState());
+										blockCount[0]++;
+									}
+
+									// and continue
+									return null;
+								}
+
+								// else abort
+								return state;
+							}, (ctx) -> null);
+						}
 					}
 				}
 			}

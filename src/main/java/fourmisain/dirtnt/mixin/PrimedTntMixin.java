@@ -31,7 +31,7 @@ public abstract class PrimedTntMixin implements Dirtable {
 		PrimedTnt self = (PrimedTnt) (Object) this;
 
 		if (isDirty()) {
-			PrimedDirtTnt.createDirtExplosion(getDirtType(), self, self.level());
+			PrimedDirtTnt.createDirtExplosion(getDirtType(), self, self.level(), true);
 			ci.cancel();
 		}
 	}

@@ -13,6 +13,7 @@
 		"PrimedTntMixin",
 		"RecipeManagerMixin",
 		"ReloadableServerRegistriesMixin",
+		"SulfurCubeMixin",
 		"TagLoaderMixin",
 		"TntBlockMixin"
 	],
