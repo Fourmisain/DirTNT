@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import fourmisain.dirtnt.DirTnt;
 import fourmisain.dirtnt.Dirtable;
 import net.minecraft.core.dispenser.BlockSource;
+import net.minecraft.core.dispenser.FlintAndSteelDispenseItemBehavior;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * since the FLINT_AND_STEEL DispenserBehavior removes the block *after* priming the TNT.
  * This is a tad more efficient though.
  */
-@Mixin(targets = "net.minecraft.core.dispenser.DispenseItemBehavior$5")
+@Mixin(FlintAndSteelDispenseItemBehavior.class)
 public abstract class FlintAndSteelDispenseItemBehaviorMixin {
 	@Inject(
 		method = "execute",
@@ -28,7 +29,7 @@ public abstract class FlintAndSteelDispenseItemBehaviorMixin {
 		)
 	)
 	protected void enableDispensedTntDirtOverride(BlockSource blockSource, ItemStack stack, CallbackInfoReturnable<ItemStack> ci,
-			@Local BlockState blockState) {
+			@Local(name = "target") BlockState blockState) {
 		DirTnt.dirtyOverride = ((Dirtable) blockState.getBlock()).getDirtType();
 	}
 

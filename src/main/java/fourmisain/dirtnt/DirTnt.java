@@ -4,6 +4,7 @@ import fourmisain.dirtnt.block.DirtTntBlock;
 import fourmisain.dirtnt.config.DirTntConfig;
 import fourmisain.dirtnt.config.GsonConfigHelper;
 import fourmisain.dirtnt.entity.PrimedDirtTnt;
+import fourmisain.dirtnt.mixin.BlocksAccessor;
 import fourmisain.dirtnt.mixin.FireBlockAccessor;
 import fourmisain.dirtnt.mixin.ItemsAccessor;
 import net.fabricmc.api.ModInitializer;
@@ -13,6 +14,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.references.BlockItemId;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
@@ -100,9 +102,10 @@ public class DirTnt implements ModInitializer {
 			Identifier id = getDirtTntBlockId(dirtType);
 
 			// register dirt tnt
-			var block = Registry.register(BuiltInRegistries.BLOCK, id,
-				new DirtTntBlock(DirtTntBlock.getDefaultProperties().setId(ResourceKey.create(Registries.BLOCK, id)), dirtType));
-			var item = ItemsAccessor.invokeRegisterBlock(block, new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id)));
+			var blockItemId = BlockItemId.create(id, id);
+
+			var block = (DirtTntBlock) BlocksAccessor.invokeRegister(blockItemId.block(), p -> new DirtTntBlock(p, dirtType), DirtTntBlock.getDefaultProperties());
+			var item = ItemsAccessor.invokeRegisterBlock(blockItemId, block);
 			var entityType = Registry.register(BuiltInRegistries.ENTITY_TYPE, id, createDirtTntEntityType(dirtType, id));
 			BLOCK_MAP.put(dirtType, block);
 			ITEM_MAP.put(dirtType, item);

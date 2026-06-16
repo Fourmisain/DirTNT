@@ -4,6 +4,7 @@
 	"package": "fourmisain.dirtnt.mixin",
 	"compatibilityLevel": "JAVA_${java_version}",
 	"mixins": [
+		"BlocksAccessor",
 		"FireBlockAccessor",
 		"FireBlockMixin",
 		"FlintAndSteelDispenseItemBehaviorMixin",
